@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/nav_graph"
+    app:startDestination="@id/homeFragment">
+
+    <fragment
+        android:id="@+id/homeFragment"
+        android:name="com.example.nutrigrow.views.HomeFragment"
+        android:label="Home"
+        tools:layout="@layout/fragment_home" />
+
+<!--    <fragment-->
+<!--        android:id="@+id/feedFragment"-->
+<!--        android:name="com.example.nutrigrow.views.FeedFragment"-->
+<!--        android:label="Feed"-->
+<!--        tools:layout="@layout/fragment_feed" />-->
+
+<!--    <fragment-->
+<!--        android:id="@+id/trackFragment"-->
+<!--        android:name="com.example.nutrigrow.views.TrackFragment"-->
+<!--        android:label="Track"-->
+<!--        tools:layout="@layout/fragment_track" />-->
+
+<!--    <fragment-->
+<!--        android:id="@+id/accountFragment"-->
+<!--        android:name="com.example.nutrigrow.views.AccountFragment"-->
+<!--        android:label="Account"-->
+<!--        tools:layout="@layout/fragment_account" />-->
+</navigation>
