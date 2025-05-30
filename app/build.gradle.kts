@@ -93,5 +93,6 @@ dependencies {
 
     implementation("org.jetbrains.kotlin:kotlin-reflect")
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.3")
+    implementation("io.github.cdimascio:dotenv-kotlin:6.4.1")
 
 }
