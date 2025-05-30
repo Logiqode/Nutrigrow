@@ -10,12 +10,13 @@ object Makanans : IntIdTable("makanan") {
     val name = varchar("nama_makanan", 255).uniqueIndex()
     val description = text("deskripsi_makanan")
     val videoTutorial = varchar("video_tutorial_makanan", 255).nullable()
-    val preparationTime = integer("preparation_time").default(0) // in minutes
+    val preparationTime = integer("preparation_time").default(0)
     val difficulty = enumeration("difficulty_level", Difficulty::class).default(Difficulty.MEDIUM)
     val createdAt = datetime("created_at").clientDefault { LocalDateTime.now() }
     val updatedAt = datetime("updated_at").nullable()
 }
 
+@Serializable
 enum class Difficulty { EASY, MEDIUM, HARD }
 
 @Serializable

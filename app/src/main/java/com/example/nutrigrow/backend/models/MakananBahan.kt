@@ -1,6 +1,7 @@
 package com.example.nutrigrow.backend.models
 
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.Contextual
 import org.jetbrains.exposed.sql.ReferenceOption
 import org.jetbrains.exposed.sql.Table
 import org.jetbrains.exposed.sql.ResultRow
@@ -27,7 +28,7 @@ object MakananBahan : Table("makanan_bahan_makanan") {
 data class MakananBahanDTO(
     val makananId: Int,
     val bahanId: Int,
-    val quantity: BigDecimal = BigDecimal.ONE,
+    @Contextual val quantity: BigDecimal = BigDecimal.ONE,
     val unit: String = "pcs"
 )
 

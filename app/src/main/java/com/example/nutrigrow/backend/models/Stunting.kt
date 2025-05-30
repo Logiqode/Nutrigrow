@@ -1,6 +1,7 @@
 package com.example.nutrigrow.backend.models
 
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.Contextual
 import org.jetbrains.exposed.dao.id.IntIdTable
 import org.jetbrains.exposed.sql.ReferenceOption
 import org.jetbrains.exposed.sql.ResultRow
@@ -9,8 +10,8 @@ import java.math.BigDecimal
 import java.time.LocalDateTime
 
 object Stuntings : IntIdTable("stunting") {
-    val weight = decimal("berat_badan", 6, 2)  // e.g. 12.34 kg
-    val height = decimal("tinggi_badan", 6, 2) // e.g.  85.50 cm
+    val weight = decimal("berat_badan", 6, 2)
+    val height = decimal("tinggi_badan", 6, 2)
     val ageInMonths = integer("age_in_months").default(0)
     val notes = varchar("catatan_stunting", 255).nullable()
     val prediction = varchar("hasil_prediksi", 50)
@@ -23,12 +24,12 @@ object Stuntings : IntIdTable("stunting") {
 @Serializable
 data class StuntingDTO(
     val id: Int? = null,
-    val weight: BigDecimal,
-    val height: BigDecimal,
+    @Contextual val weight: BigDecimal,
+    @Contextual val height: BigDecimal,
     val ageInMonths: Int = 0,
     val notes: String? = null,
     val prediction: String,
-    val confidenceScore: BigDecimal? = null,
+    @Contextual val confidenceScore: BigDecimal? = null,
     val userId: Int,
     val measuredAt: String,
     val createdAt: String? = null
