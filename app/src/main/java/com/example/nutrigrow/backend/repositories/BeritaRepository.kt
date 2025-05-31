@@ -35,7 +35,7 @@ class BeritaRepository {
             it[title] = berita.title
             it[subtitle] = berita.subtitle
             it[content] = berita.content
-            it[category] = berita.categoryId?.let { catId -> catId }
+            it[category] = berita.categoryId
         } > 0
     }
 
