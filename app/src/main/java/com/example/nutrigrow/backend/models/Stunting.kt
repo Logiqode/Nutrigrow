@@ -9,7 +9,7 @@ import org.jetbrains.exposed.sql.javatime.datetime
 import java.math.BigDecimal
 import java.time.LocalDateTime
 
-object Stuntings : IntIdTable("stunting") {
+object Stunting : IntIdTable("stunting") {
     val weight = decimal("berat_badan", 6, 2)
     val height = decimal("tinggi_badan", 6, 2)
     val ageInMonths = integer("age_in_months").default(0)
@@ -36,14 +36,14 @@ data class StuntingDTO(
 )
 
 fun ResultRow.toStuntingDTO() = StuntingDTO(
-    id = this[Stuntings.id].value,
-    weight = this[Stuntings.weight],
-    height = this[Stuntings.height],
-    ageInMonths = this[Stuntings.ageInMonths],
-    notes = this[Stuntings.notes],
-    prediction = this[Stuntings.prediction],
-    confidenceScore = this[Stuntings.confidenceScore],
-    userId = this[Stuntings.user].value,
-    measuredAt = this[Stuntings.measuredAt].toString(),
-    createdAt = this[Stuntings.createdAt].toString()
+    id = this[Stunting.id].value,
+    weight = this[Stunting.weight],
+    height = this[Stunting.height],
+    ageInMonths = this[Stunting.ageInMonths],
+    notes = this[Stunting.notes],
+    prediction = this[Stunting.prediction],
+    confidenceScore = this[Stunting.confidenceScore],
+    userId = this[Stunting.user].value,
+    measuredAt = this[Stunting.measuredAt].toString(),
+    createdAt = this[Stunting.createdAt].toString()
 )
