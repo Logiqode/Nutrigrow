@@ -47,7 +47,8 @@ class StuntingRepository {
     }
 
     suspend fun predictRisk(weight: BigDecimal, height: BigDecimal, ageInMonths: Int): String {
-        // Implement WHO-based prediction logic here
+
+        // TODO: Call ML API for the Results
         return "Normal" // Placeholder
     }
 }
