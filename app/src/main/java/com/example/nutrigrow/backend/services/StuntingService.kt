@@ -15,8 +15,7 @@ class StuntingService : KoinComponent {
     suspend fun updateStuntingRecord(id: Int, record: StuntingDTO): Boolean = repository.update(id, record)
     suspend fun deleteStuntingRecord(id: Int): Boolean = repository.delete(id)
     suspend fun getStuntingRecordsByUser(userId: Int): List<StuntingDTO> = repository.getByUser(userId)
-    suspend fun predictStuntingRisk(weight: BigDecimal, height: BigDecimal, ageInMonths: Int): String {
-        // Implement prediction logic based on WHO standards
-        return repository.predictRisk(weight, height, ageInMonths)
+    suspend fun predictStuntingRisk(jenisKelamin: Int, height: BigDecimal, ageInMonths: Int): String {
+        return repository.predictRisk(jenisKelamin, height, ageInMonths)
     }
 }
