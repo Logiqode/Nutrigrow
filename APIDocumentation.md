@@ -1,7 +1,7 @@
 # NutriGrow API Documentation
 
 ## Base URL
-`https://your-domain.com/api`
+`https://127.0.0.1:8000/`
 
 ## Authentication
 Most endpoints require authentication. Use the `/user/login` endpoint to obtain credentials.
