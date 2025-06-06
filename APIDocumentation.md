@@ -1,4 +1,4 @@
-# NutriGrow API Documentation
+# NutriGrow API Documentation (REDACTED)
 
 ## Base URL
 `https://127.0.0.1:8000/`
