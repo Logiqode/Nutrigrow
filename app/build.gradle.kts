@@ -1,8 +1,7 @@
 plugins {
-    alias(libs.plugins.android.application)
-    alias(libs.plugins.kotlin.android)
-    alias(libs.plugins.kotlin.compose)
-    kotlin("plugin.serialization") version "1.9.0"
+    id("com.android.application")
+    id("org.jetbrains.kotlin.android")
+    id("org.jetbrains.kotlin.plugin.compose")
 }
 
 android {
@@ -48,53 +47,35 @@ android {
 }
 
 dependencies {
-
+    // Core Android
     implementation(libs.androidx.core.ktx)
-    implementation(libs.androidx.lifecycle.runtime.ktx)
-    implementation(libs.androidx.activity.compose)
+    implementation(libs.androidx.appcompat)
+    implementation(libs.material)
+    implementation(libs.androidx.constraintlayout)
+
+    // Lifecycle components
+    implementation(libs.androidx.lifecycle.viewmodel.ktx)
+    implementation(libs.androidx.lifecycle.livedata.ktx)
+
+    // Networking
+    implementation(libs.retrofit)
+    implementation(libs.converter.gson)
+    implementation(libs.logging.interceptor)
+
+    // Coroutines
+    implementation(libs.kotlinx.coroutines.android)
+    implementation(libs.androidx.navigation.fragment)
+    implementation(libs.androidx.navigation.ui)
+
+    // Testing
+    testImplementation(libs.junit)
+    androidTestImplementation(libs.androidx.junit)
+    androidTestImplementation(libs.androidx.espresso.core)
+
     implementation(platform(libs.androidx.compose.bom))
     implementation(libs.androidx.ui)
     implementation(libs.androidx.ui.graphics)
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
-    implementation(libs.androidx.fragment)
-    testImplementation(libs.junit)
-    androidTestImplementation(libs.androidx.junit)
-    androidTestImplementation(libs.androidx.espresso.core)
-    androidTestImplementation(platform(libs.androidx.compose.bom))
-    androidTestImplementation(libs.androidx.ui.test.junit4)
-    debugImplementation(libs.androidx.ui.tooling)
-    debugImplementation(libs.androidx.ui.test.manifest)
-    implementation(libs.androidx.appcompat)
-    implementation(libs.material)
-    implementation(libs.androidx.constraintlayout)
-    implementation(libs.androidx.navigation.fragment)
-    implementation(libs.androidx.navigation.ui)
-
-    // Backend Dependencies
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-slf4j:1.8.0")
-    implementation("io.ktor:ktor-server-netty:2.3.0")
-    implementation("io.ktor:ktor-server-core:2.3.0")
-    implementation("io.ktor:ktor-serialization-kotlinx-json:2.3.0")
-    implementation("org.jetbrains.exposed:exposed-core:0.41.1")
-    implementation("org.jetbrains.exposed:exposed-dao:0.41.1")
-    implementation("org.jetbrains.exposed:exposed-jdbc:0.41.1")
-    implementation("com.h2database:h2:2.1.214")
-    implementation("org.jetbrains.exposed:exposed-java-time:0.41.1")
-    implementation("io.insert-koin:koin-ktor:3.5.0")
-    implementation("io.insert-koin:koin-logger-slf4j:3.5.0")
-    implementation("at.favre.lib:bcrypt:0.9.0")
-    implementation("io.ktor:ktor-server-content-negotiation-jvm:2.3.0")
-    implementation("io.ktor:ktor-serialization-kotlinx-json-jvm:2.3.0")
-    implementation("io.ktor:ktor-server-call-logging-jvm:2.3.0")
-    implementation("io.ktor:ktor-server-status-pages-jvm:2.3.0")
-    implementation("ch.qos.logback:logback-classic:1.5.18")
-    implementation("org.postgresql:postgresql:42.7.3")
-
-    implementation("org.jetbrains.kotlin:kotlin-reflect")
-    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.3")
-    implementation("io.github.cdimascio:dotenv-kotlin:6.4.1")
-    implementation("com.squareup.okhttp3:okhttp:4.12.0")
-
-
+    implementation(libs.androidx.navigation.compose)
 }
