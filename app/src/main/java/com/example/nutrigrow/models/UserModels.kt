@@ -6,29 +6,23 @@ data class RegisterRequest(
     val email: String,
     val password: String,
     val name: String
-){
-
-}
+)
 
 data class LoginRequest(
     val email: String,
     val password: String
-){
-
-}
+)
 
 data class LoginResponse(
     val accessToken: String,
     val refreshToken: String,
     val user: UserResponse
-){
+)
 
-}
-
-data class UpdateProfileRequest(
+data class UpdateUserRequest(
     val name: String,
     val email: String,
-    val gender: String? = null
+    val password: String
 )
 
 data class UserResponse(
@@ -39,5 +33,4 @@ data class UserResponse(
     val role: String = "",
     @SerializedName("image_url") val imageUrl: String = "",
     @SerializedName("is_verified") val isVerified: Boolean = false,
-    val gender: String? = null
 )

@@ -3,27 +3,41 @@ package com.example.nutrigrow.views
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.foundation.layout.*
-import androidx.compose.material3.*
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.nutrigrow.api.ApiService
+import com.example.nutrigrow.models.BahanMakananResponse
+import com.example.nutrigrow.models.LoginRequest
+import com.example.nutrigrow.models.LoginResponse
+import com.example.nutrigrow.models.RegisterRequest
+import com.example.nutrigrow.models.UpdateUserRequest
 import com.example.nutrigrow.models.UserResponse
 import com.example.nutrigrow.ui.theme.NutriGrowTheme
-import com.example.nutrigrow.viewmodel.HomeViewModel
+import com.example.nutrigrow.viewmodel.AuthViewModel
+import kotlinx.coroutines.delay
+import okhttp3.ResponseBody.Companion.toResponseBody
+import retrofit2.Response
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            NutriGrowTheme { // Replace with your theme
+            NutriGrowTheme {
                 Surface(
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-                    ProfileApp()
+                    // This is the main entry point for the testable app
+                    AppEntry()
                 }
             }
         }
@@ -31,107 +45,79 @@ class MainActivity : ComponentActivity() {
 }
 
 @Composable
-fun HomeScreen(viewModel: HomeViewModel = viewModel()) {
-    val apiResponse by viewModel.apiResponse.collectAsState()
+fun AppEntry() {
+    // This state will determine whether to show the login screen or the success screen
+    var isLoggedIn by remember { mutableStateOf(false) }
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(16.dp),
-        verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        Button(onClick = { viewModel.fetchData("test") }) {
-            Text("Fetch Data")
+    if (isLoggedIn) {
+        // Show a simple success screen after login
+        Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+            Text(text = "Login Successful!", style = MaterialTheme.typography.headlineMedium)
         }
-        Spacer(modifier = Modifier.height(16.dp))
-        when (apiResponse) {
-            null -> Text("No data yet. Click the button!")
-            else -> Text("API Response: ${apiResponse!!.message}")
-        }
+    } else {
+        // The factory that creates our ViewModel with the fake API service
+        val factory = AuthViewModelFactory(FakeApiService())
+        // Get the AuthViewModel instance
+        val authViewModel: AuthViewModel = viewModel(factory = factory)
+
+        // Show the authentication screen
+        AuthScreen(
+            authViewModel = authViewModel,
+            onLoginSuccess = { authToken ->
+                // In a real app, you would save the token and navigate
+                println("Logged in with token: $authToken")
+                isLoggedIn = true
+            }
+        )
     }
 }
 
-sealed class ProfileScreen {
-    object Account : ProfileScreen()
-    object ProfileView : ProfileScreen()
-    object EditProfile : ProfileScreen()
-    object ChangePassword : ProfileScreen()
+// A simple ViewModelFactory to provide the ApiService to our AuthViewModel
+class AuthViewModelFactory(private val apiService: ApiService) : ViewModelProvider.Factory {
+    override fun <T : ViewModel> create(modelClass: Class<T>): T {
+        if (modelClass.isAssignableFrom(AuthViewModel::class.java)) {
+            @Suppress("UNCHECKED_CAST")
+            return AuthViewModel(apiService) as T
+        }
+        throw IllegalArgumentException("Unknown ViewModel class")
+    }
 }
 
-@Composable
-fun ProfileApp() {
-    // Test user data
-    val testUser = UserResponse(
-        id = "fcecae08-7768-45ce-bca3-6239fbf84cb2",
-        name = "Revy Pramana",
-        email = "alomani@gmail.com",
-        telpNumber = "",
-        role = "admin",
-        imageUrl = "https://via.placeholder.com/150", // You can use a real image URL
-        isVerified = false,
-        gender = "Male"
-    )
 
-    var currentScreen by remember { mutableStateOf<ProfileScreen>(ProfileScreen.Account) }
-    var currentUser by remember { mutableStateOf(testUser) }
+// This is a fake implementation of your ApiService for testing the UI
+class FakeApiService : ApiService {
+    override suspend fun getBahanMakanan(): Response<BahanMakananResponse> {
+        TODO("Not yet implemented")
+    }
 
-    when (currentScreen) {
-        ProfileScreen.Account -> {
-            AccountScreen(
-                user = currentUser,
-                onProfileClick = { currentScreen = ProfileScreen.ProfileView },
-                onChangePasswordClick = { currentScreen = ProfileScreen.ChangePassword },
-                onFAQClick = { /* Handle FAQ */ },
-                onAboutUsClick = { /* Handle About Us */ },
-                onTermsClick = { /* Handle Terms */ },
-                onLogoutClick = { /* Handle Logout */ },
-                onCloseClick = { /* Handle Close - go back to main app */ }
-            )
+    override suspend fun register(request: RegisterRequest): Response<UserResponse> {
+        TODO("Not yet implemented")
+    }
+
+    override suspend fun login(request: LoginRequest): Response<LoginResponse> {
+        // Simulate a network delay
+        delay(1000)
+
+        // Simulate a failure if the password is "wrong"
+        if (request.password == "wrong") {
+            return Response.error(401, "{\"message\":\"Invalid credentials\"}".toResponseBody(null))
         }
 
-        ProfileScreen.ProfileView -> {
-            ProfileViewScreen(
-                user = currentUser,
-                onBackClick = { currentScreen = ProfileScreen.Account },
-                onEditClick = { currentScreen = ProfileScreen.EditProfile }
-            )
-        }
+        // Simulate a successful login
+        val user = UserResponse(id = "123", email = request.email, name = "Test User")
+        val response = LoginResponse(
+            accessToken = "fake-access-token-12345",
+            refreshToken = "fake-refresh-token-67890",
+            user = user
+        )
+        return Response.success(response)
+    }
 
-        ProfileScreen.EditProfile -> {
-            EditProfileScreen(
-                user = currentUser,
-                onBackClick = { currentScreen = ProfileScreen.ProfileView },
-                onSave = { name, email, gender ->
-                    // Update user data
-                    currentUser = currentUser.copy(
-                        name = name,
-                        email = email,
-                        gender = gender
-                    )
-                    // Go back to profile view
-                    currentScreen = ProfileScreen.ProfileView
+    override suspend fun getMe(token: String): Response<UserResponse> {
+        TODO("Not yet implemented")
+    }
 
-                    // Here you would call your API
-                    // viewModel.updateProfile(name, email, gender)
-                }
-            )
-        }
-
-        ProfileScreen.ChangePassword -> {
-            ChangePasswordScreen(
-                onBackClick = { currentScreen = ProfileScreen.Account },
-                onSave = { currentPassword, newPassword, confirmPassword ->
-                    // Validate and change password
-                    if (newPassword == confirmPassword && newPassword.length >= 6) {
-                        // Handle password change
-                        currentScreen = ProfileScreen.Account
-
-                        // Here you would call your API
-                        // viewModel.changePassword(currentPassword, newPassword, confirmPassword)
-                    }
-                }
-            )
-        }
+    override suspend fun updateUser(token: String, request: UpdateUserRequest): Response<UserResponse> {
+        TODO("Not yet implemented")
     }
 }

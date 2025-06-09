@@ -84,4 +84,11 @@ dependencies {
     implementation(libs.androidx.material3)
     implementation(libs.androidx.navigation.compose)
     implementation(libs.androidx.fragment.ktx)
+
+    // ViewModel Testing
+    testImplementation(libs.androidx.core.testing)
+    testImplementation(libs.kotlinx.coroutines.test)
+
+    // For Mocking dependencies
+    testImplementation(libs.mockk)
 }

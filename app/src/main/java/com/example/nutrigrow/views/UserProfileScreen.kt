@@ -220,35 +220,6 @@ fun ProfileViewScreen(
             )
         )
 
-        Spacer(modifier = Modifier.height(16.dp))
-
-        Text(
-            text = "Gender",
-            fontSize = 14.sp,
-            color = DarkGray,
-            modifier = Modifier.padding(bottom = 12.dp)
-        )
-
-        // Gender buttons (disabled state)
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(12.dp)
-        ) {
-            GenderButton(
-                text = "Male",
-                isSelected = user.gender == "Male",
-                enabled = false,
-                modifier = Modifier.weight(1f)
-            ) { }
-
-            GenderButton(
-                text = "Female",
-                isSelected = user.gender == "Female",
-                enabled = false,
-                modifier = Modifier.weight(1f)
-            ) { }
-        }
-
         Spacer(modifier = Modifier.height(32.dp))
 
         // Edit Profile button
@@ -276,11 +247,10 @@ fun ProfileViewScreen(
 fun EditProfileScreen(
     user: UserResponse,
     onBackClick: () -> Unit,
-    onSave: (String, String, String) -> Unit
+    onSave: (String, String) -> Unit
 ) {
     var name by remember { mutableStateOf(user.name) }
     var email by remember { mutableStateOf(user.email) }
-    var gender by remember { mutableStateOf(user.gender ?: "") }
 
     Column(
         modifier = Modifier
@@ -358,40 +328,11 @@ fun EditProfileScreen(
             modifier = Modifier.fillMaxWidth()
         )
 
-        Spacer(modifier = Modifier.height(16.dp))
-
-        Text(
-            text = "Gender",
-            fontSize = 14.sp,
-            color = DarkGray,
-            modifier = Modifier.padding(bottom = 12.dp)
-        )
-
-        // Gender buttons
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(12.dp)
-        ) {
-            GenderButton(
-                text = "Male",
-                isSelected = gender == "Male",
-                enabled = true,
-                modifier = Modifier.weight(1f)
-            ) { gender = "Male" }
-
-            GenderButton(
-                text = "Female",
-                isSelected = gender == "Female",
-                enabled = true,
-                modifier = Modifier.weight(1f)
-            ) { gender = "Female" }
-        }
-
         Spacer(modifier = Modifier.height(32.dp))
 
         // Save button
         Button(
-            onClick = { onSave(name, email, gender) },
+            onClick = { onSave(name, email) },
             modifier = Modifier
                 .fillMaxWidth()
                 .height(48.dp),
@@ -550,35 +491,85 @@ fun ChangePasswordScreen(
     }
 }
 
+
+sealed class ProfileScreen {
+    object Account : ProfileScreen()
+    object ProfileView : ProfileScreen()
+    object EditProfile : ProfileScreen()
+    object ChangePassword : ProfileScreen()
+}
+
 @Composable
-fun GenderButton(
-    text: String,
-    isSelected: Boolean,
-    enabled: Boolean,
-    modifier: Modifier = Modifier,
-    onClick: () -> Unit
-) {
-    Button(
-        onClick = onClick,
-        enabled = enabled,
-        modifier = modifier.height(48.dp),
-        colors = ButtonDefaults.buttonColors(
-            containerColor = if (isSelected) PrimaryPink else LightPink,
-            disabledContainerColor = if (isSelected) PrimaryPink else LightPink
-        ),
-        shape = RoundedCornerShape(24.dp)
-    ) {
-        // Gender icon
-        Text(
-            text = if (text == "Male") "♂" else "♀",
-            fontSize = 16.sp,
-            color = if (enabled) Color.Black else Color.Gray
-        )
-        Spacer(modifier = Modifier.width(8.dp))
-        Text(
-            text = text,
-            fontSize = 14.sp,
-            color = if (enabled) Color.Black else Color.Gray
-        )
+fun ProfileApp() {
+    // Test user data
+    val testUser = UserResponse(
+        id = "fcecae08-7768-45ce-bca3-6239fbf84cb2",
+        name = "Revy Pramana",
+        email = "alomani@gmail.com",
+        telpNumber = "",
+        role = "admin",
+        imageUrl = "https://via.placeholder.com/150",
+        isVerified = false
+    )
+
+    var currentScreen by remember { mutableStateOf<ProfileScreen>(ProfileScreen.Account) }
+    var currentUser by remember { mutableStateOf(testUser) }
+
+    when (currentScreen) {
+        ProfileScreen.Account -> {
+            AccountScreen(
+                user = currentUser,
+                onProfileClick = { currentScreen = ProfileScreen.ProfileView },
+                onChangePasswordClick = { currentScreen = ProfileScreen.ChangePassword },
+                onFAQClick = { /* Handle FAQ */ },
+                onAboutUsClick = { /* Handle About Us */ },
+                onTermsClick = { /* Handle Terms */ },
+                onLogoutClick = { /* Handle Logout */ },
+                onCloseClick = { /* Handle Close - go back to main app */ }
+            )
+        }
+
+        ProfileScreen.ProfileView -> {
+            ProfileViewScreen(
+                user = currentUser,
+                onBackClick = { currentScreen = ProfileScreen.Account },
+                onEditClick = { currentScreen = ProfileScreen.EditProfile }
+            )
+        }
+
+        ProfileScreen.EditProfile -> {
+            EditProfileScreen(
+                user = currentUser,
+                onBackClick = { currentScreen = ProfileScreen.ProfileView },
+                onSave = { name, email ->
+                    // Update user data
+                    currentUser = currentUser.copy(
+                        name = name,
+                        email = email,
+                    )
+                    // Go back to profile view
+                    currentScreen = ProfileScreen.ProfileView
+
+                    // Here you would call your API
+                    // viewModel.updateProfile(name, email)
+                }
+            )
+        }
+
+        ProfileScreen.ChangePassword -> {
+            ChangePasswordScreen(
+                onBackClick = { currentScreen = ProfileScreen.Account },
+                onSave = { currentPassword, newPassword, confirmPassword ->
+                    // Validate and change password
+                    if (newPassword == confirmPassword && newPassword.length >= 6) {
+                        // Handle password change
+                        currentScreen = ProfileScreen.Account
+
+                        // Here you would call your API
+                        // viewModel.changePassword(currentPassword, newPassword, confirmPassword)
+                    }
+                }
+            )
+        }
     }
 }

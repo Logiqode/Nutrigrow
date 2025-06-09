@@ -2,7 +2,7 @@ package com.example.nutrigrow.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.nutrigrow.models.UpdateProfileRequest
+import com.example.nutrigrow.models.UpdateUserRequest
 import com.example.nutrigrow.models.UserResponse
 import com.example.nutrigrow.api.ApiService
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -63,8 +63,8 @@ class UserViewModel(
             _uiState.value = _uiState.value.copy(isLoading = true, errorMessage = null)
 
             try {
-                val request = UpdateProfileRequest(name, email, gender)
-                val response = apiService.updateProfile(authToken, request)
+                val request = UpdateUserRequest(name, email, gender)
+                val response = apiService.updateUser(authToken, request)
 
                 if (response.isSuccessful) {
                     response.body()?.let { updatedUser ->

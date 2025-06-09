@@ -1,24 +1,12 @@
 package com.example.nutrigrow.api
 
-import com.example.nutrigrow.models.BahanMakananResponse
-import com.example.nutrigrow.models.LoginRequest
-import com.example.nutrigrow.models.LoginResponse
-import com.example.nutrigrow.models.RegisterRequest
-import com.example.nutrigrow.models.UpdateProfileRequest
-import com.example.nutrigrow.models.UserResponse
+import com.example.nutrigrow.models.*
 import retrofit2.Response
-import retrofit2.http.Body
-import retrofit2.http.GET
-import retrofit2.http.Header
-import retrofit2.http.POST
-import retrofit2.http.PUT
+import retrofit2.http.*
 
 interface ApiService {
     @GET("api/bahan-makanan")
     suspend fun getBahanMakanan(): Response<BahanMakananResponse>
-
-//    @GET("api/user")
-//    suspend fun getAllUsers(@Header("Authorization") token: String): Response<GetAllUserResponse>
 
     @POST("api/user")
     suspend fun register(@Body request: RegisterRequest): Response<UserResponse>
@@ -29,10 +17,10 @@ interface ApiService {
     @GET("api/user/me")
     suspend fun getMe(@Header("Authorization") token: String): Response<UserResponse>
 
-    @PUT("api/user/me")
-    suspend fun updateProfile(
+    @PATCH("api/user")
+    suspend fun updateUser(
         @Header("Authorization") token: String,
-        @Body request: UpdateProfileRequest
+        @Body request: UpdateUserRequest
     ): Response<UserResponse>
 
 }
