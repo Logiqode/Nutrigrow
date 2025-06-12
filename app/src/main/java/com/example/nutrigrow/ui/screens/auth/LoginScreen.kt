@@ -13,7 +13,10 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.nutrigrow.ui.theme.NutriGrowTheme
 import com.example.nutrigrow.ui.theme.PrimaryPink
+import com.example.nutrigrow.ui.theme.SplashBackground
+import com.example.nutrigrow.ui.theme.SplashText
 
 @Composable
 fun LoginRoute(
@@ -49,7 +52,6 @@ fun LoginRoute(
     // Handle successful login navigation
     LaunchedEffect(uiState.loginResponse) {
         uiState.loginResponse?.let { loginData ->
-            // FIX: Access accessToken from the loginData object
             loginData.accessToken?.let { token ->
                 authViewModel.saveTokenAfterLogin(token)
                 onLoginSuccess()
@@ -72,8 +74,8 @@ fun LoginScreen(
     Box(
         modifier = modifier
             .fillMaxSize()
-            .background(Color.White)
-            .padding(16.dp),
+            .background(SplashBackground) // THEME CHANGE: Use splash screen background color
+            .padding(horizontal = 24.dp),
         contentAlignment = Alignment.Center
     ) {
         Column(
@@ -83,23 +85,31 @@ fun LoginScreen(
         ) {
             Text(
                 text = "Welcome Back!",
-                fontSize = 24.sp,
+                fontSize = 28.sp,
                 fontWeight = FontWeight.Bold,
-                color = Color.Black
+                color = SplashText // THEME CHANGE: Use splash screen text color
             )
             Spacer(modifier = Modifier.height(8.dp))
             Text(
                 text = "Login to continue",
                 fontSize = 16.sp,
-                color = Color.Gray
+                color = SplashText.copy(alpha = 0.8f) // THEME CHANGE: Use lighter text color
             )
-            Spacer(modifier = Modifier.height(32.dp))
+            Spacer(modifier = Modifier.height(48.dp))
 
             OutlinedTextField(
                 value = email,
                 onValueChange = { email = it },
                 label = { Text("Email") },
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.fillMaxWidth(),
+                // THEME CHANGE: Customize text field colors
+                colors = OutlinedTextFieldDefaults.colors(
+                    focusedBorderColor = PrimaryPink,
+                    unfocusedBorderColor = Color.Gray.copy(alpha = 0.4f),
+                    cursorColor = PrimaryPink,
+                    focusedTextColor = SplashText,
+                    unfocusedTextColor = SplashText,
+                )
             )
 
             Spacer(modifier = Modifier.height(16.dp))
@@ -109,10 +119,18 @@ fun LoginScreen(
                 onValueChange = { password = it },
                 label = { Text("Password") },
                 visualTransformation = PasswordVisualTransformation(),
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.fillMaxWidth(),
+                // THEME CHANGE: Customize text field colors
+                colors = OutlinedTextFieldDefaults.colors(
+                    focusedBorderColor = PrimaryPink,
+                    unfocusedBorderColor = Color.Gray.copy(alpha = 0.4f),
+                    cursorColor = PrimaryPink,
+                    focusedTextColor = SplashText,
+                    unfocusedTextColor = SplashText,
+                )
             )
 
-            Spacer(modifier = Modifier.height(32.dp))
+            Spacer(modifier = Modifier.height(48.dp))
 
             Button(
                 onClick = { onLoginClicked(email, password) },
@@ -120,11 +138,14 @@ fun LoginScreen(
                     .fillMaxWidth()
                     .height(50.dp),
                 colors = ButtonDefaults.buttonColors(containerColor = PrimaryPink),
-                shape = RoundedCornerShape(8.dp),
+                shape = RoundedCornerShape(12.dp), // Adjusted for a softer look
                 enabled = !uiState.isLoading
             ) {
                 if (uiState.isLoading) {
-                    CircularProgressIndicator(color = Color.White)
+                    CircularProgressIndicator(
+                        modifier = Modifier.size(24.dp),
+                        color = Color.White
+                    )
                 } else {
                     Text(text = "Login", color = Color.White, fontSize = 16.sp)
                 }
@@ -133,36 +154,14 @@ fun LoginScreen(
     }
 }
 
-@Preview(name = "Default State", showBackground = true)
+// THEME CHANGE: Added a themed preview
+@Preview(showBackground = true, name = "Themed Login Screen")
 @Composable
-fun LoginScreenPreview() {
-    // You can wrap it in your app's theme if you have one
-    // NutriGrowTheme {
-    LoginScreen(
-        uiState = LoginUiState(isLoading = false, errorMessage = null),
-        onLoginClicked = { _, _ -> }, // Do nothing in preview
-    )
-    // }
-}
-
-@Preview(showBackground = true)
-@Composable
-fun LoginScreenLoadingPreview() {
-    // NutriGrowTheme {
-    LoginScreen(
-        uiState = LoginUiState(isLoading = true),
-        onLoginClicked = { _, _ -> },
-    )
-    // }
-}
-
-@Preview(showBackground = true)
-@Composable
-fun LoginScreenErrorPreview() {
-    // NutriGrowTheme {
-    LoginScreen(
-        uiState = LoginUiState(errorMessage = "Invalid credentials. Please try again."),
-        onLoginClicked = { _, _ -> },
-    )
-    // }
+fun LoginScreenThemedPreview() {
+    NutriGrowTheme {
+        LoginScreen(
+            uiState = LoginUiState(isLoading = false, errorMessage = null),
+            onLoginClicked = { _, _ -> },
+        )
+    }
 }
