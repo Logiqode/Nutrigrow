@@ -13,6 +13,7 @@ import com.example.nutrigrow.di.ViewModelFactory
 import com.example.nutrigrow.ui.screens.auth.AuthViewModel
 import com.example.nutrigrow.ui.screens.auth.LoginRoute
 import com.example.nutrigrow.ui.screens.home.HomeScreenRoute
+import com.example.nutrigrow.ui.screens.splash.SplashScreen // <-- IMPORT THE NEW SCREEN
 import com.example.nutrigrow.ui.screens.stunting.StuntingRoute
 import com.example.nutrigrow.ui.screens.user.ChangePasswordRoute
 import com.example.nutrigrow.ui.screens.user.EditProfileRoute
@@ -23,6 +24,7 @@ import com.example.nutrigrow.ui.screens.user.UserViewModel
 
 // Defines the routes for navigation, ensuring type safety.
 sealed class Screen(val route: String) {
+    object Splash : Screen("splash") // <-- ADD SPLASH ROUTE
     object Login : Screen("login")
     object Home : Screen("home")
     object Stunting : Screen("stunting")
@@ -41,8 +43,22 @@ fun AppNavHost() {
 
     NavHost(
         navController = navController,
-        startDestination = Screen.Login.route
+        startDestination = Screen.Splash.route // <-- CHANGE START DESTINATION
     ) {
+        // Splash Screen
+        composable(Screen.Splash.route) {
+            SplashScreen(
+                onTimeout = {
+                    // Navigate to Login and remove Splash from the back stack
+                    navController.navigate(Screen.Login.route) {
+                        popUpTo(Screen.Splash.route) {
+                            inclusive = true
+                        }
+                    }
+                }
+            )
+        }
+
         // Login Screen (not part of any nested graph)
         composable(Screen.Login.route) {
             val authViewModel: AuthViewModel = viewModel(factory = viewModelFactory)
@@ -92,7 +108,7 @@ fun AppNavHost() {
                 UserProfileRoute(
                     viewModel = userViewModel,
                     onNavigate = { route -> navController.navigate(route) },
-                    onClose = { navController.popBackStack() }, // Corrected typo
+                    onClose = { navController.popBackStack() },
                     onLogout = {
                         authViewModel.logout()
                         navController.navigate(Screen.Login.route) {
@@ -112,7 +128,7 @@ fun AppNavHost() {
 
                 ProfileViewRoute(
                     viewModel = userViewModel,
-                    onBackClick = { navController.popBackStack() }, // Corrected typo
+                    onBackClick = { navController.popBackStack() },
                     onNavigateToEdit = { navController.navigate(Screen.EditProfile.route) }
                 )
             }
@@ -125,8 +141,8 @@ fun AppNavHost() {
 
                 EditProfileRoute(
                     viewModel = userViewModel,
-                    onBackClick = { navController.popBackStack() }, // Corrected typo
-                    onSaveSuccess = { navController.popBackStack() } // Corrected typo
+                    onBackClick = { navController.popBackStack() },
+                    onSaveSuccess = { navController.popBackStack() }
                 )
             }
 
@@ -138,8 +154,8 @@ fun AppNavHost() {
 
                 ChangePasswordRoute(
                     viewModel = userViewModel,
-                    onBackClick = { navController.popBackStack() }, // Corrected typo
-                    onChangeSuccess = { navController.popBackStack() } // Corrected typo
+                    onBackClick = { navController.popBackStack() },
+                    onChangeSuccess = { navController.popBackStack() }
                 )
             }
         }

@@ -17,3 +17,9 @@ val PrimaryPink = Color(0xFFE8B4B8)
 val LightPink = Color(0xFFF5E6E8)
 val DarkGray = Color(0xFF666666)
 val LightGray = Color(0xFFF8F8F8)
+
+// ADD THESE NEW COLORS FOR THE SPLASH SCREEN
+val SplashBackground = Color(0xFFFDF7F2)
+val SplashPinkLight = Color(0xFFFCE9E8)
+val SplashPinkDark = Color(0xFFF9E0DE)
+val SplashText = Color(0xFF442C2E)
