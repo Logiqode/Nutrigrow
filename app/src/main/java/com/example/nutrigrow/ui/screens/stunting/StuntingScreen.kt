@@ -1,18 +1,38 @@
 package com.example.nutrigrow.ui.screens.stunting
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.nutrigrow.di.ViewModelFactory
+import com.example.nutrigrow.ui.theme.NutriGrowTheme
+import com.example.nutrigrow.ui.theme.PrimaryPink
+import com.example.nutrigrow.ui.theme.SplashBackground
+import com.example.nutrigrow.ui.theme.SplashText
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
+import java.util.Locale
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun StuntingRoute(
     modifier: Modifier = Modifier,
+    onBackClick: () -> Unit
 ) {
     val context = LocalContext.current
     val viewModel: StuntingViewModel = viewModel(factory = ViewModelFactory.getInstance(context))
@@ -23,7 +43,8 @@ fun StuntingRoute(
         uiState = uiState,
         onPredictClicked = { umurBulan, jenisKelamin, tinggiBadan ->
             viewModel.predictStunting(umurBulan, jenisKelamin, tinggiBadan)
-        }
+        },
+        onBackClick = onBackClick
     )
 }
 
@@ -32,10 +53,12 @@ fun StuntingRoute(
 fun StuntingScreen(
     modifier: Modifier = Modifier,
     uiState: StuntingUiState,
-    onPredictClicked: (Int, String, Int) -> Unit
+    onPredictClicked: (Int, String, Int) -> Unit,
+    onBackClick: () -> Unit
 ) {
     var umurBulan by remember { mutableStateOf("") }
     var tinggiBadan by remember { mutableStateOf("") }
+    // REMOVED: Catatan state variable is removed
 
     val genderOptions = listOf("Laki-laki", "Perempuan")
     var selectedGender by remember { mutableStateOf(genderOptions[0]) }
@@ -43,124 +66,220 @@ fun StuntingScreen(
 
     val isFormValid = umurBulan.isNotBlank() && tinggiBadan.isNotBlank()
 
-    Column(
-        modifier = modifier
-            .fillMaxSize()
-            .padding(16.dp),
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        Text(text = "Stunting Prediction", style = MaterialTheme.typography.headlineMedium)
-        Spacer(modifier = Modifier.height(16.dp))
+    // Date formatting
+    val currentDate = LocalDate.now()
+    val dayFormatter = DateTimeFormatter.ofPattern("EEEE", Locale("id", "ID"))
+    val dateFormatter = DateTimeFormatter.ofPattern("d MMMM yyyy", Locale("id", "ID"))
+    val dayName = currentDate.format(dayFormatter).uppercase()
+    val formattedDate = currentDate.format(dateFormatter)
 
-        OutlinedTextField(
-            value = umurBulan,
-            onValueChange = { umurBulan = it.filter { char -> char.isDigit() } },
-            label = { Text("Umur (bulan)") },
-            modifier = Modifier.fillMaxWidth()
-        )
+    Scaffold(
+        topBar = {
+            TopAppBar(
+                title = { Text("Predict Baby Stunting", fontWeight = FontWeight.Bold) },
+                navigationIcon = {
+                    IconButton(onClick = onBackClick) {
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
+                    }
+                },
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = SplashBackground,
+                    titleContentColor = SplashText
+                )
+            )
+        },
+        containerColor = SplashBackground
+    ) { paddingValues ->
+        Column(
+            modifier = modifier
+                .fillMaxSize()
+                .padding(paddingValues)
+                .padding(horizontal = 24.dp)
+                .verticalScroll(rememberScrollState()),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Text(
+                text = dayName,
+                fontSize = 32.sp,
+                fontWeight = FontWeight.Bold,
+                color = SplashText
+            )
+            Text(
+                text = formattedDate,
+                fontSize = 18.sp,
+                color = SplashText.copy(alpha = 0.8f)
+            )
+
+            Spacer(modifier = Modifier.height(32.dp))
+
+            StuntingInputField(label = "Umur bayi (Bulan)", value = umurBulan, onValueChange = { umurBulan = it.filter { char -> char.isDigit() } })
+            Spacer(modifier = Modifier.height(16.dp))
+
+            StuntingDropdownField(
+                label = "Jenis Kelamin",
+                selectedValue = selectedGender,
+                options = genderOptions,
+                isExpanded = isGenderDropdownExpanded,
+                onExpandedChange = { isGenderDropdownExpanded = it },
+                onValueChange = { selectedGender = it }
+            )
+            Spacer(modifier = Modifier.height(16.dp))
+
+            StuntingInputField(label = "Tinggi Bayi", value = tinggiBadan, onValueChange = { tinggiBadan = it.filter { char -> char.isDigit() } }, trailingText = "cm")
+
+            // REMOVED: Catatan Input Field and Spacer are removed from here
+            Spacer(modifier = Modifier.height(32.dp))
+
+            Button(
+                onClick = {
+                    onPredictClicked(
+                        umurBulan.toInt(),
+                        selectedGender,
+                        tinggiBadan.toInt()
+                    )
+                },
+                enabled = !uiState.isLoading && isFormValid,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(50.dp),
+                colors = ButtonDefaults.buttonColors(containerColor = PrimaryPink),
+                shape = RoundedCornerShape(12.dp)
+            ) {
+                if (uiState.isLoading) {
+                    CircularProgressIndicator(modifier = Modifier.size(24.dp), color = Color.White)
+                } else {
+                    Text("SAVE", color = Color.White, fontSize = 16.sp, fontWeight = FontWeight.Bold)
+                }
+            }
+
+            if (uiState.errorMessage != null) {
+                Spacer(modifier = Modifier.height(16.dp))
+                Card(
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.errorContainer)
+                ) {
+                    Text(text = uiState.errorMessage, color = MaterialTheme.colorScheme.onError, modifier = Modifier.padding(16.dp))
+                }
+            }
+
+            if (uiState.predictionResult != null) {
+                Spacer(modifier = Modifier.height(16.dp))
+                Card(
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primaryContainer)
+                ) {
+                    Column(modifier = Modifier.padding(16.dp)) {
+                        Text("Prediction Result", style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.onPrimaryContainer)
+                        Spacer(modifier = Modifier.height(8.dp))
+                        Text("Status Gizi: ${uiState.predictionResult.statusGizi}", color = MaterialTheme.colorScheme.onPrimaryContainer)
+                        Text("Confidence: %.1f%%".format(uiState.predictionResult.confidence * 100), color = MaterialTheme.colorScheme.onPrimaryContainer)
+                    }
+                }
+            }
+            Spacer(modifier = Modifier.height(16.dp))
+        }
+    }
+}
+
+@Composable
+private fun StuntingInputField(
+    label: String,
+    value: String,
+    onValueChange: (String) -> Unit,
+    singleLine: Boolean = true,
+    height: Dp = Dp.Unspecified,
+    trailingText: String? = null
+) {
+    Column(modifier = Modifier.fillMaxWidth()) {
+        Text(text = label, color = SplashText.copy(alpha = 0.8f), fontSize = 14.sp)
         Spacer(modifier = Modifier.height(8.dp))
+        OutlinedTextField(
+            value = value,
+            onValueChange = onValueChange,
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(height),
+            singleLine = singleLine,
+            shape = RoundedCornerShape(12.dp),
+            colors = OutlinedTextFieldDefaults.colors(
+                focusedBorderColor = PrimaryPink,
+                unfocusedBorderColor = Color.Gray.copy(alpha = 0.2f),
+                cursorColor = PrimaryPink,
+                focusedTextColor = SplashText,
+                unfocusedTextColor = SplashText,
+                unfocusedContainerColor = Color.White,
+                focusedContainerColor = Color.White
+            ),
+            trailingIcon = {
+                if (trailingText != null) {
+                    Text(trailingText, color = Color.Gray)
+                }
+            }
+        )
+    }
+}
 
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun StuntingDropdownField(
+    label: String,
+    selectedValue: String,
+    options: List<String>,
+    isExpanded: Boolean,
+    onExpandedChange: (Boolean) -> Unit,
+    onValueChange: (String) -> Unit
+) {
+    Column(modifier = Modifier.fillMaxWidth()) {
+        Text(text = label, color = SplashText.copy(alpha = 0.8f), fontSize = 14.sp)
+        Spacer(modifier = Modifier.height(8.dp))
         ExposedDropdownMenuBox(
-            expanded = isGenderDropdownExpanded,
-            onExpandedChange = { isGenderDropdownExpanded = !isGenderDropdownExpanded },
-            modifier = Modifier.fillMaxWidth()
+            expanded = isExpanded,
+            onExpandedChange = onExpandedChange
         ) {
             OutlinedTextField(
-                value = selectedGender,
+                value = selectedValue,
                 onValueChange = {},
                 readOnly = true,
-                label = { Text("Jenis Kelamin") },
-                trailingIcon = {
-                    ExposedDropdownMenuDefaults.TrailingIcon(expanded = isGenderDropdownExpanded)
-                },
                 modifier = Modifier
-                    .menuAnchor()
                     .fillMaxWidth()
+                    .menuAnchor(),
+                shape = RoundedCornerShape(12.dp),
+                trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = isExpanded) },
+                colors = OutlinedTextFieldDefaults.colors(
+                    focusedBorderColor = PrimaryPink,
+                    unfocusedBorderColor = Color.Gray.copy(alpha = 0.2f),
+                    focusedTextColor = SplashText,
+                    unfocusedTextColor = SplashText,
+                    unfocusedContainerColor = Color.White,
+                    focusedContainerColor = Color.White
+                )
             )
             ExposedDropdownMenu(
-                expanded = isGenderDropdownExpanded,
-                onDismissRequest = { isGenderDropdownExpanded = false }
+                expanded = isExpanded,
+                onDismissRequest = { onExpandedChange(false) }
             ) {
-                genderOptions.forEach { gender ->
+                options.forEach { option ->
                     DropdownMenuItem(
-                        text = { Text(gender) },
+                        text = { Text(option) },
                         onClick = {
-                            selectedGender = gender
-                            isGenderDropdownExpanded = false
+                            onValueChange(option)
+                            onExpandedChange(false)
                         }
                     )
                 }
             }
         }
+    }
+}
 
-        Spacer(modifier = Modifier.height(8.dp))
-
-        OutlinedTextField(
-            value = tinggiBadan,
-            onValueChange = { tinggiBadan = it.filter { char -> char.isDigit() } },
-            label = { Text("Tinggi Badan (cm)") },
-            modifier = Modifier.fillMaxWidth()
+@Preview(showBackground = true)
+@Composable
+fun StuntingScreenPreview() {
+    NutriGrowTheme {
+        StuntingScreen(
+            uiState = StuntingUiState(),
+            onPredictClicked = { _, _, _ -> },
+            onBackClick = {}
         )
-        Spacer(modifier = Modifier.height(16.dp))
-
-        Button(
-            onClick = {
-                onPredictClicked(
-                    umurBulan.toInt(),
-                    selectedGender,
-                    tinggiBadan.toInt()
-                )
-            },
-            enabled = !uiState.isLoading && isFormValid,
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            if (uiState.isLoading) {
-                CircularProgressIndicator(
-                    modifier = Modifier.size(24.dp),
-                    color = MaterialTheme.colorScheme.onPrimary
-                )
-            } else {
-                Text("Predict")
-            }
-        }
-
-        uiState.errorMessage?.let {
-            Spacer(modifier = Modifier.height(16.dp))
-            Card(
-                modifier = Modifier.fillMaxWidth(),
-                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.errorContainer)
-            ) {
-                Text(
-                    text = it,
-                    color = MaterialTheme.colorScheme.onError,
-                    modifier = Modifier.padding(16.dp)
-                )
-            }
-        }
-
-        uiState.predictionResult?.let {
-            Spacer(modifier = Modifier.height(16.dp))
-            Card(
-                modifier = Modifier.fillMaxWidth(),
-                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primaryContainer)
-            ) {
-                Column(modifier = Modifier.padding(16.dp)) {
-                    Text(
-                        "Prediction Result",
-                        style = MaterialTheme.typography.titleMedium,
-                        color = MaterialTheme.colorScheme.onPrimaryContainer
-                    )
-                    Spacer(modifier = Modifier.height(8.dp))
-                    Text(
-                        "Status Gizi: ${it.statusGizi}",
-                        color = MaterialTheme.colorScheme.onPrimaryContainer
-                    )
-                    Text(
-                        "Confidence: %.1f%%".format(it.confidence * 100),
-                        color = MaterialTheme.colorScheme.onPrimaryContainer
-                    )
-                }
-            }
-        }
     }
 }

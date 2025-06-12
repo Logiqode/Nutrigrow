@@ -87,7 +87,11 @@ fun AppNavHost() {
         }
 
         composable(Screen.Stunting.route) {
-            StuntingRoute()
+            StuntingRoute(
+                onBackClick = {
+                    navController.popBackStack()
+                }
+            )
         }
 
         // --- NESTED NAVIGATION GRAPH FOR THE PROFILE FEATURE ---
