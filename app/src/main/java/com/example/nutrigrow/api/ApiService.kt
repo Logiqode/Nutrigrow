@@ -6,19 +6,20 @@ import retrofit2.http.*
 
 interface ApiService {
     @GET("api/bahan-makanan")
-    suspend fun getBahanMakanan(): Response<BahanMakananResponse>
+    suspend fun getBahanMakanan(): Response<ApiResponse<List<BahanMakanan>>>
 
     @POST("api/user")
-    suspend fun register(@Body request: RegisterRequest): Response<UserResponse>
+    // Assumes registration returns the new UserResponse inside the 'data' object
+    suspend fun register(@Body request: RegisterRequest): Response<ApiResponse<UserResponse>>
 
     @POST("api/user/login")
-    suspend fun login(@Body request: LoginRequest): Response<LoginResponse>
+    // Using ApiResponse<LoginData> is more consistent than our old LoginResponse
+    suspend fun login(@Body request: LoginRequest): Response<ApiResponse<LoginData>>
 
-    // The @Header parameter is no longer needed! The interceptor handles it.
     @GET("api/user/me")
-    suspend fun getMe(): Response<UserResponse>
+    suspend fun getMe(): Response<ApiResponse<UserResponse>>
 
-    // This one also no longer needs the token parameter.
     @PATCH("api/user")
-    suspend fun updateUser(@Body request: UpdateUserRequest): Response<UserResponse>
+    // Assumes updating the user returns the updated UserResponse inside the 'data' object
+    suspend fun updateUser(@Body request: UpdateUserRequest): Response<ApiResponse<UserResponse>>
 }

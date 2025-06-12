@@ -48,10 +48,9 @@ fun LoginRoute(
 
     // Handle successful login navigation
     LaunchedEffect(uiState.loginResponse) {
-        uiState.loginResponse?.let { response ->
-            // Access the token through the nested 'data' object.
-            // Use the safe-call operator (?.) in case 'data' or 'accessToken' is null.
-            response.data?.accessToken?.let { token ->
+        uiState.loginResponse?.let { loginData ->
+            // FIX: Access accessToken from the loginData object
+            loginData.accessToken?.let { token ->
                 authViewModel.saveTokenAfterLogin(token)
                 onLoginSuccess()
             }

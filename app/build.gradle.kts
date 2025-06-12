@@ -79,6 +79,9 @@ dependencies {
     // Image Loading
     implementation(libs.coil.compose)
 
+    // Icons
+    implementation(libs.composeIcons.fontAwesome)
+
     // Testing
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)

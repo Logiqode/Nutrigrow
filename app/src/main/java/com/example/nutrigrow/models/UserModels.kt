@@ -35,17 +35,17 @@ data class LoginResponse(
 )
 
 data class UpdateUserRequest(
-    val name: String,
-    val email: String,
-    val password: String
+    val name: String? = null,
+    val email: String? = null,
+    val password: String? = null
 )
 
 data class UserResponse(
     val id: String,
-    val email: String,
-    val name: String,
-    @SerializedName("telp_number") val telpNumber: String = "",
-    val role: String = "",
-    @SerializedName("image_url") val imageUrl: String = "",
+    val email: String?,
+    val name: String?,
+    @SerializedName("telp_number") val telpNumber: String? = "",
+    val role: String? = "",
+    @SerializedName("image_url") val imageUrl: String? = "",
     @SerializedName("is_verified") val isVerified: Boolean = false,
 )

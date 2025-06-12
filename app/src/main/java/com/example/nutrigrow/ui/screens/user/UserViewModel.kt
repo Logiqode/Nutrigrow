@@ -33,13 +33,17 @@ class UserViewModel(
     fun loadUserProfile() {
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true, errorMessage = null) }
-
             try {
-                // FIX: Call getMe() without the token parameter.
                 val response = apiService.getMe()
+
                 if (response.isSuccessful) {
-                    response.body()?.let { user ->
+                    // FIX: Access the user object inside the 'data' field.
+                    val user = response.body()?.data
+                    if (user != null) {
                         _uiState.update { it.copy(user = user, isLoading = false) }
+                    } else {
+                        // This can happen if the 'data' field itself is null
+                        _uiState.update { it.copy(isLoading = false, errorMessage = "User data is empty") }
                     }
                 } else {
                     _uiState.update { it.copy(isLoading = false, errorMessage = "Failed to load profile") }
@@ -50,33 +54,65 @@ class UserViewModel(
         }
     }
 
-    fun updateProfile(name: String, email: String, gender: String) {
+    // This function is now for updating non-sensitive details.
+    fun updateProfileDetails(name: String, email: String) {
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true, errorMessage = null, isUpdateSuccess = false) }
-
             try {
-                val request = UpdateUserRequest(name, email, gender)
-                // FIX: Call updateUser() without the token parameter.
+                // We create a request with only the name and email. Password will be null and thus omitted.
+                val request = UpdateUserRequest(name = name, email = email)
                 val response = apiService.updateUser(request)
 
                 if (response.isSuccessful) {
-                    response.body()?.let { updatedUser ->
-                        _uiState.update {
-                            it.copy(user = updatedUser, isLoading = false, isUpdateSuccess = true)
+                    response.body()?.let { apiResponse ->
+                        // The actual user is inside the .data property
+                        apiResponse.data?.let { updatedUser ->
+                            _uiState.update {
+                                it.copy(user = updatedUser, isLoading = false, isUpdateSuccess = true)
+                            }
                         }
                     }
                 } else {
                     _uiState.update { it.copy(isLoading = false, errorMessage = "Failed to update profile") }
                 }
             } catch (e: Exception) {
-                _uiState.update { it.copy(isLoading = false, errorMessage = e.message ?: "Unknown error occurred") }
+                _uiState.update { it.copy(isLoading = false, errorMessage = e.message ?: "Unknown error") }
             }
         }
     }
 
-    // This function looks fine as a placeholder. No changes needed.
-    fun changePassword(currentPassword: String, newPassword: String, confirmPassword: String) {
-        // ...
+    // This function now handles the password change logic but calls the same API endpoint.
+    fun updatePassword(currentPassword: String, newPassword: String, confirmPassword: String) {
+        viewModelScope.launch {
+            _uiState.update { it.copy(isLoading = true, errorMessage = null, isUpdateSuccess = false) }
+
+            // --- Client-side validation ---
+            if (newPassword != confirmPassword) {
+                _uiState.update { it.copy(isLoading = false, errorMessage = "New passwords don't match") }
+                return@launch
+            }
+            if (newPassword.length < 6) { // Or whatever your rule is
+                _uiState.update { it.copy(isLoading = false, errorMessage = "Password must be at least 6 characters") }
+                return@launch
+            }
+            // NOTE: A real app might also require the 'currentPassword' to be sent to the server for verification.
+            // Since your API doesn't specify it, we will proceed.
+
+            try {
+                // We create a request with only the new password.
+                val request = UpdateUserRequest(password = newPassword)
+                val response = apiService.updateUser(request)
+
+                if (response.isSuccessful) {
+                    _uiState.update { it.copy(isLoading = false, isUpdateSuccess = true) }
+                } else {
+                    // You could parse the server's error message here for more detail
+                    _uiState.update { it.copy(isLoading = false, errorMessage = "Failed to change password") }
+                }
+            } catch (e: Exception) {
+                _uiState.update { it.copy(isLoading = false, errorMessage = e.message ?: "Unknown error") }
+            }
+        }
     }
 
     fun clearUpdateSuccess() {

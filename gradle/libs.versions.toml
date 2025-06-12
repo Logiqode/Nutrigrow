@@ -8,6 +8,7 @@ coreKtx = "1.16.0"
 coreTesting = "2.2.0"
 datastorePreferences = "1.1.7"
 espressoCore = "3.6.1"
+iconsCompose-fontAwesome = "1.1.1"
 fragmentKtx = "1.8.8"
 junit = "4.13.2"
 junitVersion = "1.2.1"
@@ -46,6 +47,7 @@ androidx-ui-graphics = { module = "androidx.compose.ui:ui-graphics" }
 androidx-ui-tooling-preview = { module = "androidx.compose.ui:ui-tooling-preview" }
 coil-compose = { module = "io.coil-kt:coil-compose", version.ref = "coilCompose" }
 converter-gson = { module = "com.squareup.retrofit2:converter-gson", version.ref = "retrofit" }
+composeIcons-fontAwesome = { module = "br.com.devsrsouza.compose.icons:font-awesome", version.ref = "iconsCompose-fontAwesome" }
 junit = { module = "junit:junit", version.ref = "junit" }
 kotlinx-coroutines-android = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-android", version.ref = "kotlinxCoroutinesAndroid" }
 kotlinx-coroutines-test = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-test", version.ref = "kotlinxCoroutinesTest" }
