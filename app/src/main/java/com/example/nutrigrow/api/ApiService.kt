@@ -22,4 +22,8 @@ interface ApiService {
     @PATCH("api/user")
     // Assumes updating the user returns the updated UserResponse inside the 'data' object
     suspend fun updateUser(@Body request: UpdateUserRequest): Response<ApiResponse<UserResponse>>
+
+    @POST("api/stunting/predict")
+    suspend fun predictStunting(@Body request: StuntingPredictRequest): Response<ApiResponse<StuntingPredictResponse>>
+
 }

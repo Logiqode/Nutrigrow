@@ -13,6 +13,7 @@ import com.example.nutrigrow.di.ViewModelFactory
 import com.example.nutrigrow.ui.screens.auth.AuthViewModel
 import com.example.nutrigrow.ui.screens.auth.LoginRoute
 import com.example.nutrigrow.ui.screens.home.HomeScreenRoute
+import com.example.nutrigrow.ui.screens.stunting.StuntingRoute
 import com.example.nutrigrow.ui.screens.user.ChangePasswordRoute
 import com.example.nutrigrow.ui.screens.user.EditProfileRoute
 import com.example.nutrigrow.ui.screens.user.ProfileViewRoute
@@ -24,6 +25,7 @@ import com.example.nutrigrow.ui.screens.user.UserViewModel
 sealed class Screen(val route: String) {
     object Login : Screen("login")
     object Home : Screen("home")
+    object Stunting : Screen("stunting")
     object UserProfile : Screen("user_profile")
     object ProfileView : Screen("profile_view")
     object EditProfile : Screen("edit_profile")
@@ -61,8 +63,15 @@ fun AppNavHost() {
             HomeScreenRoute(
                 onProfileClicked = {
                     navController.navigate("profile_flow")
+                },
+                onNavigateToStunting = {
+                    navController.navigate(Screen.Stunting.route)
                 }
             )
+        }
+
+        composable(Screen.Stunting.route) {
+            StuntingRoute()
         }
 
         // --- NESTED NAVIGATION GRAPH FOR THE PROFILE FEATURE ---

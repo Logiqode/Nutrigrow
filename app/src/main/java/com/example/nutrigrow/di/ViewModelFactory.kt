@@ -8,6 +8,7 @@ import com.example.nutrigrow.api.RetrofitClient
 import com.example.nutrigrow.di.SessionManager
 import com.example.nutrigrow.ui.screens.auth.AuthViewModel
 import com.example.nutrigrow.ui.screens.bahanmakanan.BahanMakananViewModel
+import com.example.nutrigrow.ui.screens.stunting.StuntingViewModel
 import com.example.nutrigrow.ui.screens.user.UserViewModel
 
 // The factory responsible for creating all ViewModels that have dependencies.
@@ -28,6 +29,9 @@ class ViewModelFactory(
             }
             modelClass.isAssignableFrom(UserViewModel::class.java) -> {
                 UserViewModel(apiService) as T
+            }
+            modelClass.isAssignableFrom(StuntingViewModel::class.java) -> {
+                StuntingViewModel(apiService) as T
             }
             else -> throw IllegalArgumentException("Unknown ViewModel class: " + modelClass.name)
         }

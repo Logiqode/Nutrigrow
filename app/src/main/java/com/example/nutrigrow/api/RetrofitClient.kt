@@ -12,7 +12,7 @@ object RetrofitClient {
     // Using a hardcoded IP is fine for local development.
     // For production, this MUST be a proper domain name (e.g., "https://api.nutrigrow.com/").
     // The "http://" protocol is insecure. Production apps must use "https://" (HTTPS).
-    const val BASE_URL = "http://192.168.18.42:8888/"
+    const val BASE_URL = "http://172.22.96.220:8888/"
 
     // You'll need a way to get the auth token, e.g., from SharedPreferences.
     // For now, this is a placeholder.

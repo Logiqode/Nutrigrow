@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
+import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -25,12 +26,14 @@ import com.example.nutrigrow.ui.screens.bahanmakanan.BahanMakananRoute
  */
 @Composable
 fun HomeScreenRoute(
-    onProfileClicked: () -> Unit
+    onProfileClicked: () -> Unit,
+    onNavigateToStunting: () -> Unit
 ) {
     // In the future, you could get a UserViewModel here to get the user's name
     // For now, we pass the navigation event down to the screen.
     HomeScreen(
-        onProfileClicked = onProfileClicked
+        onProfileClicked = onProfileClicked,
+        onNavigateToStunting = onNavigateToStunting
     )
 }
 
@@ -40,7 +43,8 @@ fun HomeScreenRoute(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen(
-    onProfileClicked: () -> Unit
+    onProfileClicked: () -> Unit,
+    onNavigateToStunting: () -> Unit
 ) {
     Scaffold(
         topBar = {
@@ -74,6 +78,12 @@ fun HomeScreen(
                 text = "Jaga Gizi si Kecil Hari Ini", // "Take care of your little one's nutrition today"
                 style = MaterialTheme.typography.bodyLarge
             )
+
+            Spacer(modifier = Modifier.height(24.dp))
+
+            Button(onClick = onNavigateToStunting) {
+                Text("Go to Stunting Prediction")
+            }
 
             Spacer(modifier = Modifier.height(24.dp))
 
