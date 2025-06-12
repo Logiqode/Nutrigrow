@@ -13,10 +13,25 @@ data class LoginRequest(
     val password: String
 )
 
+// 1. Create this new class to represent the nested "data" object in the JSON
+data class LoginData(
+    @SerializedName("access_token")
+    val accessToken: String?, // Use @SerializedName to match the JSON field name
+
+    @SerializedName("refresh_token")
+    val refreshToken: String?
+)
+
+// 2. Update your LoginResponse to match the overall JSON structure
 data class LoginResponse(
-    val accessToken: String,
-    val refreshToken: String,
-    val user: UserResponse
+    @SerializedName("status")
+    val status: Boolean,
+
+    @SerializedName("message")
+    val message: String,
+
+    @SerializedName("data")
+    val data: LoginData? // This property holds the nested LoginData object
 )
 
 data class UpdateUserRequest(

@@ -1,4 +1,4 @@
-package com.example.nutrigrow.views
+package com.example.nutrigrow.ui.screens.auth
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -10,34 +10,51 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.nutrigrow.ui.theme.PrimaryPink
-import com.example.nutrigrow.viewmodel.AuthViewModel
-import com.example.nutrigrow.viewmodel.LoginUiState
 
 @Composable
-fun AuthScreen(
-    authViewModel: AuthViewModel, // Pass your ViewModel instance here
-    onLoginSuccess: (String) -> Unit // Callback to pass the auth token
+fun LoginRoute(
+    authViewModel: AuthViewModel,
+    onLoginSuccess: () -> Unit
 ) {
     val uiState by authViewModel.uiState.collectAsState()
+    val snackbarHostState = remember { SnackbarHostState() }
 
-    LoginScreen(
-        uiState = uiState,
-        onLoginClicked = { email, password ->
-            authViewModel.login(email, password)
-        },
-        onErrorDismissed = {
-            authViewModel.clearError()
+    // Use Scaffold for layout structure and snackbar support
+    Scaffold(
+        snackbarHost = { SnackbarHost(snackbarHostState) }
+    ) { paddingValues -> // Scaffold provides padding
+        LoginScreen(
+            modifier = Modifier.padding(paddingValues), // Apply padding
+            uiState = uiState,
+            onLoginClicked = authViewModel::login
+        )
+    }
+
+    // Handle showing the snackbar for errors
+    val errorMessage = uiState.errorMessage
+    LaunchedEffect(errorMessage) {
+        errorMessage?.let {
+            snackbarHostState.showSnackbar(
+                message = it,
+                duration = SnackbarDuration.Short
+            )
+            authViewModel.clearError() // Clear error after showing
         }
-    )
+    }
 
-    // Handle successful login
+    // Handle successful login navigation
     LaunchedEffect(uiState.loginResponse) {
-        uiState.loginResponse?.let {
-            onLoginSuccess(it.accessToken)
+        uiState.loginResponse?.let { response ->
+            // Access the token through the nested 'data' object.
+            // Use the safe-call operator (?.) in case 'data' or 'accessToken' is null.
+            response.data?.accessToken?.let { token ->
+                authViewModel.saveTokenAfterLogin(token)
+                onLoginSuccess()
+            }
         }
     }
 }
@@ -46,15 +63,15 @@ fun AuthScreen(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun LoginScreen(
+    modifier: Modifier = Modifier,
     uiState: LoginUiState,
     onLoginClicked: (String, String) -> Unit,
-    onErrorDismissed: () -> Unit
 ) {
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
 
     Box(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxSize()
             .background(Color.White)
             .padding(16.dp),
@@ -114,18 +131,39 @@ fun LoginScreen(
                 }
             }
         }
-
-        uiState.errorMessage?.let { message ->
-            AlertDialog(
-                onDismissRequest = onErrorDismissed,
-                title = { Text("Login Failed") },
-                text = { Text(message) },
-                confirmButton = {
-                    Button(onClick = onErrorDismissed) {
-                        Text("OK")
-                    }
-                }
-            )
-        }
     }
+}
+
+@Preview(name = "Default State", showBackground = true)
+@Composable
+fun LoginScreenPreview() {
+    // You can wrap it in your app's theme if you have one
+    // NutriGrowTheme {
+    LoginScreen(
+        uiState = LoginUiState(isLoading = false, errorMessage = null),
+        onLoginClicked = { _, _ -> }, // Do nothing in preview
+    )
+    // }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun LoginScreenLoadingPreview() {
+    // NutriGrowTheme {
+    LoginScreen(
+        uiState = LoginUiState(isLoading = true),
+        onLoginClicked = { _, _ -> },
+    )
+    // }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun LoginScreenErrorPreview() {
+    // NutriGrowTheme {
+    LoginScreen(
+        uiState = LoginUiState(errorMessage = "Invalid credentials. Please try again."),
+        onLoginClicked = { _, _ -> },
+    )
+    // }
 }

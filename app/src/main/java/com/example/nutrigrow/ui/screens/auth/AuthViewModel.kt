@@ -1,8 +1,10 @@
-package com.example.nutrigrow.viewmodel
+package com.example.nutrigrow.ui.screens.auth
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.nutrigrow.api.ApiService
+import com.example.nutrigrow.api.RetrofitClient
+import com.example.nutrigrow.di.SessionManager
 import com.example.nutrigrow.models.LoginRequest
 import com.example.nutrigrow.models.LoginResponse
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -18,7 +20,8 @@ data class LoginUiState(
 )
 
 class AuthViewModel(
-    private val apiService: ApiService
+    private val apiService: ApiService,
+    private val sessionManager: SessionManager
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(LoginUiState())
@@ -57,6 +60,13 @@ class AuthViewModel(
                     errorMessage = e.message ?: "Unknown error occurred"
                 )
             }
+        }
+    }
+
+    fun saveTokenAfterLogin(token: String) {
+        viewModelScope.launch {
+            sessionManager.saveAuthToken(token)
+            RetrofitClient.setAuthToken(token)
         }
     }
 

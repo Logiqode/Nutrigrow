@@ -37,7 +37,9 @@ android {
     buildFeatures {
         compose = true
     }
-
+    buildFeatures {
+        buildConfig = true // <-- Add this line
+    }
     packaging {
         resources {
             excludes += "META-INF/INDEX.LIST"
@@ -66,8 +68,13 @@ dependencies {
 
     // Coroutines
     implementation(libs.kotlinx.coroutines.android)
+
+    // Navigation
     implementation(libs.androidx.navigation.fragment)
     implementation(libs.androidx.navigation.ui)
+
+    // Persistent Storage
+    implementation(libs.androidx.datastore.preferences)
 
     // Image Loading
     implementation(libs.coil.compose)
@@ -91,4 +98,5 @@ dependencies {
 
     // For Mocking dependencies
     testImplementation(libs.mockk)
+    debugImplementation(libs.androidx.ui.tooling)
 }

@@ -14,13 +14,11 @@ interface ApiService {
     @POST("api/user/login")
     suspend fun login(@Body request: LoginRequest): Response<LoginResponse>
 
+    // The @Header parameter is no longer needed! The interceptor handles it.
     @GET("api/user/me")
-    suspend fun getMe(@Header("Authorization") token: String): Response<UserResponse>
+    suspend fun getMe(): Response<UserResponse>
 
+    // This one also no longer needs the token parameter.
     @PATCH("api/user")
-    suspend fun updateUser(
-        @Header("Authorization") token: String,
-        @Body request: UpdateUserRequest
-    ): Response<UserResponse>
-
+    suspend fun updateUser(@Body request: UpdateUserRequest): Response<UserResponse>
 }
