@@ -1,23 +1,15 @@
 package com.example.nutrigrow.ui.screens.stunting
 
-import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.Home
-import androidx.compose.material.icons.filled.Person
-import androidx.compose.material.icons.outlined.Book
-import androidx.compose.material.icons.outlined.CalendarViewDay
-import androidx.compose.material.icons.outlined.QrCodeScanner
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
@@ -27,8 +19,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.nutrigrow.di.ViewModelFactory
-import com.example.nutrigrow.navigation.Screen
-import com.example.nutrigrow.ui.theme.LightPink
 import com.example.nutrigrow.ui.theme.NutriGrowTheme
 import com.example.nutrigrow.ui.theme.PrimaryPink
 import com.example.nutrigrow.ui.theme.ScreenBackground
@@ -40,8 +30,7 @@ import java.util.Locale
 @Composable
 fun StuntingRoute(
     modifier: Modifier = Modifier,
-    onBackClick: () -> Unit,
-    onNavigate: (String) -> Unit
+    onBackClick: () -> Unit
 ) {
     val context = LocalContext.current
     val viewModel: StuntingViewModel = viewModel(factory = ViewModelFactory.getInstance(context))
@@ -53,8 +42,7 @@ fun StuntingRoute(
         onPredictClicked = { umurBulan, jenisKelamin, tinggiBadan ->
             viewModel.predictStunting(umurBulan, jenisKelamin, tinggiBadan)
         },
-        onBackClick = onBackClick,
-        onNavigate = onNavigate
+        onBackClick = onBackClick
     )
 }
 
@@ -64,8 +52,7 @@ fun StuntingScreen(
     modifier: Modifier = Modifier,
     uiState: StuntingUiState,
     onPredictClicked: (Int, String, Int) -> Unit,
-    onBackClick: () -> Unit,
-    onNavigate: (String) -> Unit
+    onBackClick: () -> Unit
 ) {
     var umurBulan by remember { mutableStateOf("") }
     var tinggiBadan by remember { mutableStateOf("") }
@@ -83,31 +70,7 @@ fun StuntingScreen(
     val formattedDate = currentDate.format(dateFormatter)
 
     Scaffold(
-        containerColor = ScreenBackground,
-        bottomBar = {
-            BottomAppBar(
-                containerColor = MaterialTheme.colorScheme.surface,
-                contentPadding = PaddingValues(horizontal = 16.dp)
-            ) {
-                Row(
-                    horizontalArrangement = Arrangement.SpaceAround,
-                    verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    BottomNavigationItem(icon = Icons.Default.Home, label = "Home", onClick = { onNavigate(Screen.Home.route) })
-                    BottomNavigationItem(icon = Icons.Outlined.Book, label = "Feed", onClick = { /* TODO */ })
-                    BottomNavigationItem(
-                        icon = Icons.Outlined.QrCodeScanner,
-                        label = "Scan",
-                        onClick = {},
-                        selected = false, // It's not the selected screen
-                        highlighted = true
-                    )
-                    BottomNavigationItem(icon = Icons.Outlined.CalendarViewDay, label = "Track", onClick = { /* TODO */ })
-                    BottomNavigationItem(icon = Icons.Default.Person, label = "Account", onClick = { onNavigate("profile_flow") })
-                }
-            }
-        }
+        containerColor = ScreenBackground
     ) { paddingValues ->
         Column(
             modifier = modifier
@@ -277,7 +240,7 @@ private fun StuntingDropdownField(
                 readOnly = true,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .menuAnchor(MenuAnchorType.PrimaryNotEditable), // FIX: Updated deprecated function
+                    .menuAnchor(MenuAnchorType.PrimaryNotEditable),
                 shape = RoundedCornerShape(12.dp),
                 trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = isExpanded) },
                 colors = OutlinedTextFieldDefaults.colors(
@@ -307,33 +270,6 @@ private fun StuntingDropdownField(
     }
 }
 
-@Composable
-fun BottomNavigationItem(
-    icon: androidx.compose.ui.graphics.vector.ImageVector,
-    label: String,
-    onClick: () -> Unit,
-    selected: Boolean = false,
-    highlighted: Boolean = false
-) {
-    val backgroundColor = if (highlighted) LightPink else Color.Transparent
-    val contentColor = if (highlighted) Color.White else MaterialTheme.colorScheme.onSurfaceVariant
-
-    Box(
-        modifier = Modifier
-            .clip(RoundedCornerShape(12.dp))
-            .background(backgroundColor)
-            .clickable(onClick = onClick)
-            .padding(horizontal = 16.dp, vertical = 8.dp),
-        contentAlignment = Alignment.Center
-    ) {
-        Column(horizontalAlignment = Alignment.CenterHorizontally) {
-            Icon(icon, contentDescription = label, tint = contentColor, modifier = Modifier.size(24.dp))
-            if (selected || highlighted) {
-                Text(label, style = MaterialTheme.typography.labelSmall.copy(color = contentColor))
-            }
-        }
-    }
-}
 
 @Preview(showBackground = true)
 @Composable
@@ -342,8 +278,7 @@ fun StuntingScreenPreview() {
         StuntingScreen(
             uiState = StuntingUiState(),
             onPredictClicked = { _, _, _ -> },
-            onBackClick = {},
-            onNavigate = {}
+            onBackClick = {}
         )
     }
 }
