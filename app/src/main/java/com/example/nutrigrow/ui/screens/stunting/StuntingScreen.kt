@@ -1,6 +1,5 @@
 package com.example.nutrigrow.ui.screens.stunting
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -22,13 +21,12 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.nutrigrow.di.ViewModelFactory
 import com.example.nutrigrow.ui.theme.NutriGrowTheme
 import com.example.nutrigrow.ui.theme.PrimaryPink
-import com.example.nutrigrow.ui.theme.SplashBackground
+import com.example.nutrigrow.ui.theme.ScreenBackground
 import com.example.nutrigrow.ui.theme.SplashText
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.util.Locale
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun StuntingRoute(
     modifier: Modifier = Modifier,
@@ -58,7 +56,6 @@ fun StuntingScreen(
 ) {
     var umurBulan by remember { mutableStateOf("") }
     var tinggiBadan by remember { mutableStateOf("") }
-    // REMOVED: Catatan state variable is removed
 
     val genderOptions = listOf("Laki-laki", "Perempuan")
     var selectedGender by remember { mutableStateOf(genderOptions[0]) }
@@ -66,7 +63,6 @@ fun StuntingScreen(
 
     val isFormValid = umurBulan.isNotBlank() && tinggiBadan.isNotBlank()
 
-    // Date formatting
     val currentDate = LocalDate.now()
     val dayFormatter = DateTimeFormatter.ofPattern("EEEE", Locale("id", "ID"))
     val dateFormatter = DateTimeFormatter.ofPattern("d MMMM yyyy", Locale("id", "ID"))
@@ -74,21 +70,7 @@ fun StuntingScreen(
     val formattedDate = currentDate.format(dateFormatter)
 
     Scaffold(
-        topBar = {
-            TopAppBar(
-                title = { Text("Predict Baby Stunting", fontWeight = FontWeight.Bold) },
-                navigationIcon = {
-                    IconButton(onClick = onBackClick) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
-                    }
-                },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = SplashBackground,
-                    titleContentColor = SplashText
-                )
-            )
-        },
-        containerColor = SplashBackground
+        containerColor = ScreenBackground
     ) { paddingValues ->
         Column(
             modifier = modifier
@@ -98,6 +80,23 @@ fun StuntingScreen(
                 .verticalScroll(rememberScrollState()),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
+            // Header
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 16.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                IconButton(onClick = onBackClick) {
+                    Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
+                }
+                Text(
+                    text = "Predict Baby Stunting",
+                    style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold),
+                    modifier = Modifier.padding(start = 8.dp)
+                )
+            }
+
             Text(
                 text = dayName,
                 fontSize = 32.sp,
@@ -127,7 +126,6 @@ fun StuntingScreen(
 
             StuntingInputField(label = "Tinggi Bayi", value = tinggiBadan, onValueChange = { tinggiBadan = it.filter { char -> char.isDigit() } }, trailingText = "cm")
 
-            // REMOVED: Catatan Input Field and Spacer are removed from here
             Spacer(modifier = Modifier.height(32.dp))
 
             Button(
@@ -148,7 +146,7 @@ fun StuntingScreen(
                 if (uiState.isLoading) {
                     CircularProgressIndicator(modifier = Modifier.size(24.dp), color = Color.White)
                 } else {
-                    Text("SAVE", color = Color.White, fontSize = 16.sp, fontWeight = FontWeight.Bold)
+                    Text("PREDICT", color = Color.White, fontSize = 16.sp, fontWeight = FontWeight.Bold)
                 }
             }
 
@@ -203,7 +201,7 @@ private fun StuntingInputField(
             shape = RoundedCornerShape(12.dp),
             colors = OutlinedTextFieldDefaults.colors(
                 focusedBorderColor = PrimaryPink,
-                unfocusedBorderColor = Color.Gray.copy(alpha = 0.2f),
+                unfocusedBorderColor = Color.Gray.copy(alpha = 0.4f),
                 cursorColor = PrimaryPink,
                 focusedTextColor = SplashText,
                 unfocusedTextColor = SplashText,
@@ -212,7 +210,7 @@ private fun StuntingInputField(
             ),
             trailingIcon = {
                 if (trailingText != null) {
-                    Text(trailingText, color = Color.Gray)
+                    Text(trailingText, color = Color.Gray, modifier = Modifier.padding(end = 8.dp))
                 }
             }
         )
@@ -242,12 +240,12 @@ private fun StuntingDropdownField(
                 readOnly = true,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .menuAnchor(),
+                    .menuAnchor(MenuAnchorType.PrimaryNotEditable),
                 shape = RoundedCornerShape(12.dp),
                 trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = isExpanded) },
                 colors = OutlinedTextFieldDefaults.colors(
                     focusedBorderColor = PrimaryPink,
-                    unfocusedBorderColor = Color.Gray.copy(alpha = 0.2f),
+                    unfocusedBorderColor = Color.Gray.copy(alpha = 0.4f),
                     focusedTextColor = SplashText,
                     unfocusedTextColor = SplashText,
                     unfocusedContainerColor = Color.White,
@@ -271,6 +269,7 @@ private fun StuntingDropdownField(
         }
     }
 }
+
 
 @Preview(showBackground = true)
 @Composable
