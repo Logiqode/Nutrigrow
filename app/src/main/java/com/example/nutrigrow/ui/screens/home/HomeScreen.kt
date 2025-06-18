@@ -50,13 +50,14 @@ import com.example.nutrigrow.ui.theme.TextDark
 @Composable
 fun HomeScreenRoute(
     onProfileClicked: () -> Unit,
-    onNavigateToStunting: () -> Unit
+    onNavigateToStunting: () -> Unit,
+    onNavigateToFoodRecommendation: () -> Unit
 ) {
     // For now, we pass the navigation event down to the screen.
     HomeScreen(
         onProfileClicked = onProfileClicked,
         onNavigateToStunting = onNavigateToStunting,
-        onNavigateToFoodRecommendation = { /* TODO */ }
+        onNavigateToFoodRecommendation = onNavigateToFoodRecommendation
     )
 }
 

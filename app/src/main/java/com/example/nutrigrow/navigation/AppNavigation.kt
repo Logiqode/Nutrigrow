@@ -13,6 +13,7 @@ import com.example.nutrigrow.di.ViewModelFactory
 import com.example.nutrigrow.ui.screens.auth.AuthViewModel
 import com.example.nutrigrow.ui.screens.auth.LoginRoute
 import com.example.nutrigrow.ui.screens.home.HomeScreenRoute
+import com.example.nutrigrow.ui.screens.makanan.MakananRoute
 import com.example.nutrigrow.ui.screens.splash.SplashScreen
 import com.example.nutrigrow.ui.screens.stunting.StuntingRoute
 import com.example.nutrigrow.ui.screens.user.ChangePasswordRoute
@@ -28,6 +29,7 @@ sealed class Screen(val route: String) {
     object Login : Screen("login")
     object Home : Screen("home")
     object Stunting : Screen("stunting")
+    object Makanan : Screen("makanan")
     object UserProfile : Screen("user_profile")
     object ProfileView : Screen("profile_view")
     object EditProfile : Screen("edit_profile")
@@ -49,6 +51,7 @@ fun AppNavHost() {
         composable(Screen.Splash.route) {
             SplashScreen(
                 onTimeout = {
+                    // Navigate to Login and remove Splash from the back stack
                     navController.navigate(Screen.Login.route) {
                         popUpTo(Screen.Splash.route) {
                             inclusive = true
@@ -81,6 +84,9 @@ fun AppNavHost() {
                 },
                 onNavigateToStunting = {
                     navController.navigate(Screen.Stunting.route)
+                },
+                onNavigateToFoodRecommendation = {
+                    navController.navigate(Screen.Makanan.route)
                 }
             )
         }
@@ -89,17 +95,13 @@ fun AppNavHost() {
             StuntingRoute(
                 onBackClick = {
                     navController.popBackStack()
-                },
-                // FIX: Added the missing 'onNavigate' parameter
-                onNavigate = { route ->
-                    navController.navigate(route) {
-                        popUpTo(navController.graph.findStartDestination().id) {
-                            saveState = true
-                        }
-                        launchSingleTop = true
-                        restoreState = true
-                    }
                 }
+            )
+        }
+
+        composable(Screen.Makanan.route) {
+            MakananRoute(
+                onBackClick = { navController.popBackStack() }
             )
         }
 
@@ -108,11 +110,13 @@ fun AppNavHost() {
             route = "profile_flow",
             startDestination = Screen.UserProfile.route
         ) {
-            // ... (rest of the navigation graph remains the same)
+            // Define all screens that belong to the profile graph
             composable(Screen.UserProfile.route) { backStackEntry ->
+                // This is the key: get the parent graph's back stack entry
                 val parentEntry = remember(backStackEntry) {
                     navController.getBackStackEntry("profile_flow")
                 }
+                // Create the ViewModels scoped to the parent graph
                 val authViewModel: AuthViewModel = viewModel(parentEntry, factory = viewModelFactory)
                 val userViewModel: UserViewModel = viewModel(parentEntry, factory = viewModelFactory)
 

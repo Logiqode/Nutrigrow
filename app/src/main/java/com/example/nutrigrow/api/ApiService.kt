@@ -26,4 +26,6 @@ interface ApiService {
     @POST("api/stunting/predict")
     suspend fun predictStunting(@Body request: StuntingPredictRequest): Response<ApiResponse<StuntingPredictResponse>>
 
+    @GET("api/makanan")
+    suspend fun getMakanan(): Response<ApiResponse<List<Makanan>>>
 }
