@@ -10,6 +10,7 @@ import com.example.nutrigrow.ui.screens.auth.AuthViewModel
 import com.example.nutrigrow.ui.screens.bahanmakanan.BahanMakananViewModel
 import com.example.nutrigrow.ui.screens.stunting.StuntingViewModel
 import com.example.nutrigrow.ui.screens.user.UserViewModel
+import com.example.nutrigrow.ui.screens.makanan.MakananViewModel
 
 // The factory responsible for creating all ViewModels that have dependencies.
 class ViewModelFactory(
@@ -32,6 +33,9 @@ class ViewModelFactory(
             }
             modelClass.isAssignableFrom(StuntingViewModel::class.java) -> {
                 StuntingViewModel(apiService) as T
+            }
+            modelClass.isAssignableFrom(MakananViewModel::class.java) -> {
+                MakananViewModel(apiService) as T
             }
             else -> throw IllegalArgumentException("Unknown ViewModel class: " + modelClass.name)
         }
