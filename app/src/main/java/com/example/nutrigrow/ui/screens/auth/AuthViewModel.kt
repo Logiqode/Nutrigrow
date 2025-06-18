@@ -8,6 +8,7 @@ import com.example.nutrigrow.di.SessionManager
 import com.example.nutrigrow.models.LoginData
 import com.example.nutrigrow.models.LoginRequest
 import com.example.nutrigrow.models.LoginResponse
+import com.example.nutrigrow.models.RegisterRequest
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -20,6 +21,14 @@ data class LoginUiState(
     val errorMessage: String? = null
 )
 
+// Add a new UI State for Registration
+data class RegisterUiState(
+    val isSuccess: Boolean = false,
+    val isLoading: Boolean = false,
+    val errorMessage: String? = null
+)
+
+
 class AuthViewModel(
     private val apiService: ApiService,
     private val sessionManager: SessionManager
@@ -28,21 +37,22 @@ class AuthViewModel(
     private val _uiState = MutableStateFlow(LoginUiState())
     val uiState: StateFlow<LoginUiState> = _uiState.asStateFlow()
 
+    // Add a new StateFlow for the Register UI
+    private val _registerUiState = MutableStateFlow(RegisterUiState())
+    val registerUiState: StateFlow<RegisterUiState> = _registerUiState.asStateFlow()
+
     fun login(email: String, password: String) {
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true, errorMessage = null) }
 
             try {
                 val request = LoginRequest(email, password)
-                // The response type is now Response<ApiResponse<LoginData>>
                 val response = apiService.login(request)
 
                 if (response.isSuccessful) {
-                    // Get the 'data' object from the response body
                     response.body()?.data?.let { loginData ->
                         _uiState.update {
                             it.copy(
-                                // Store the LoginData object in the state
                                 loginResponse = loginData,
                                 isLoading = false
                             )
@@ -59,6 +69,34 @@ class AuthViewModel(
         }
     }
 
+    // Add the register function
+    fun register(name: String, email: String, telpNumber: String, password: String) {
+        viewModelScope.launch {
+            _registerUiState.update { it.copy(isLoading = true, errorMessage = null, isSuccess = false) }
+
+            try {
+                val request = RegisterRequest(name = name, email = email, telpNumber = telpNumber, password = password)
+                val response = apiService.register(request)
+
+                if (response.isSuccessful && response.body()?.status == true) {
+                    _registerUiState.update {
+                        it.copy(isLoading = false, isSuccess = true)
+                    }
+                } else {
+                    val errorMessage = response.body()?.message ?: "Registration failed"
+                    _registerUiState.update {
+                        it.copy(isLoading = false, errorMessage = errorMessage)
+                    }
+                }
+            } catch (e: Exception) {
+                _registerUiState.update {
+                    it.copy(isLoading = false, errorMessage = e.message ?: "An unknown error occurred")
+                }
+            }
+        }
+    }
+
+
     fun saveTokenAfterLogin(token: String) {
         viewModelScope.launch {
             sessionManager.saveAuthToken(token)
@@ -71,6 +109,11 @@ class AuthViewModel(
             sessionManager.clearAuthToken()
             RetrofitClient.setAuthToken(null)
         }
+    }
+
+    // Function to reset the register state, e.g., after showing an error or success message
+    fun clearRegisterState() {
+        _registerUiState.value = RegisterUiState()
     }
 
     fun clearError() {

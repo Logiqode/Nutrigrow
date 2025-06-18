@@ -21,6 +21,7 @@ import com.example.nutrigrow.ui.screens.user.EditProfileRoute
 import com.example.nutrigrow.ui.screens.user.ProfileViewRoute
 import com.example.nutrigrow.ui.screens.user.UserProfileRoute
 import com.example.nutrigrow.ui.screens.user.UserViewModel
+import com.example.nutrigrow.ui.screens.auth.RegisterRoute
 
 
 // Defines the routes for navigation, ensuring type safety.
@@ -34,6 +35,7 @@ sealed class Screen(val route: String) {
     object ProfileView : Screen("profile_view")
     object EditProfile : Screen("edit_profile")
     object ChangePassword : Screen("change_password")
+    object Register : Screen("register")
 }
 
 
@@ -68,10 +70,27 @@ fun AppNavHost() {
                 authViewModel = authViewModel,
                 onLoginSuccess = {
                     navController.navigate(Screen.Home.route) {
-                        popUpTo(Screen.Login.route) {
-                            inclusive = true
-                        }
+                        popUpTo(Screen.Login.route) { inclusive = true }
                     }
+                },
+                onNavigateToRegister = {
+                    navController.navigate(Screen.Register.route)
+                }
+            )
+        }
+
+        composable(Screen.Register.route) {
+            val authViewModel: AuthViewModel = viewModel(factory = viewModelFactory)
+            RegisterRoute(
+                authViewModel = authViewModel,
+                onRegisterSuccess = {
+                    navController.navigate(Screen.Login.route) {
+                        // Go back to login after registration, clearing register from back stack
+                        popUpTo(Screen.Register.route) { inclusive = true }
+                    }
+                },
+                onNavigateToLogin = {
+                    navController.popBackStack()
                 }
             )
         }
