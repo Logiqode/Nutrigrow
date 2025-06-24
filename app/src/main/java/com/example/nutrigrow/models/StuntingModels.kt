@@ -35,6 +35,7 @@ data class StuntingResponse(
     @SerializedName("tinggi_badan") val tinggiBadan: Double,
     @SerializedName("catatan_stunting") val catatanStunting: String,
     @SerializedName("hasil_prediksi") val hasilPrediksi: String,
+    @SerializedName("created_at") val createdAt: String, // Added this field
     @SerializedName("user") val user: UserResponse? = null
 )
 

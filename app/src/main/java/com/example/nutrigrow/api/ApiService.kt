@@ -26,4 +26,23 @@ interface ApiService {
     @POST("api/stunting/predict")
     suspend fun predictStunting(@Body request: StuntingPredictRequest): Response<ApiResponse<StuntingPredictResponse>>
 
+    // Calendar endpoints
+    @GET("api/stunting/calendar")
+    suspend fun getStuntingCalendar(
+        @Query("year") year: Int,
+        @Query("month") month: Int
+    ): Response<ApiResponse<List<StuntingResponse>>>
+
+    @POST("api/stunting")
+    suspend fun createStuntingRecord(@Body request: CalendarNoteCreateRequest): Response<ApiResponse<StuntingResponse>>
+
+    @PUT("api/stunting/{id}")
+    suspend fun updateStuntingRecord(
+        @Path("id") id: String,
+        @Body request: CalendarNoteUpdateRequest
+    ): Response<ApiResponse<StuntingResponse>>
+
+    @DELETE("api/stunting/{id}")
+    suspend fun deleteStuntingRecord(@Path("id") id: String): Response<ApiResponse<Unit>>
+
 }

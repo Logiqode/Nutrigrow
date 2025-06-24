@@ -73,6 +73,9 @@ dependencies {
     implementation(libs.androidx.navigation.fragment)
     implementation(libs.androidx.navigation.ui)
 
+    // Datetime
+    implementation(libs.kotlinx.datetime)
+
     // Persistent Storage
     implementation(libs.androidx.datastore.preferences)
 

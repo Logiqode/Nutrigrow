@@ -9,25 +9,63 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.nutrigrow.di.SessionManager
 import com.example.nutrigrow.ui.theme.NutriGrowTheme
 import com.example.nutrigrow.ui.theme.SplashBackground
 import com.example.nutrigrow.ui.theme.SplashPinkDark
 import com.example.nutrigrow.ui.theme.SplashPinkLight
 import com.example.nutrigrow.ui.theme.SplashText
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.first
 
 @Composable
 fun SplashScreen(
-    onTimeout: () -> Unit
+    onTimeout: () -> Unit,
+    onAutoLogin: () -> Unit = {}
 ) {
+    val context = LocalContext.current
+    val sessionManager = SessionManager(context)
+    
     // This effect will run once when the composable enters the screen
     LaunchedEffect(Unit) {
-        delay(2000) // Wait for 2 seconds
-        onTimeout()
+        delay(2000) // Wait for 2 seconds for splash display
+        
+        try {
+            // Check for auto-login
+            // First check if there's a valid session (within 2 hours)
+            val authToken = sessionManager.authToken.first()
+            
+            if (authToken != null) {
+                val sessionValid = sessionManager.isSessionValid()
+                
+                if (sessionValid) {
+                    // Session is still valid, update last login time and go to main
+                    sessionManager.updateLastLoginTime()
+                    onAutoLogin()
+                    return@LaunchedEffect
+                }
+            }
+            
+            // If session expired, check remember me token
+            val rememberMeToken = sessionManager.checkAndRefreshRememberMe()
+            if (rememberMeToken != null) {
+                // Remember me token is valid, restore session and go to main
+                sessionManager.saveAuthToken(rememberMeToken, true)
+                onAutoLogin()
+                return@LaunchedEffect
+            }
+            
+            // No valid session or remember me, go to login
+            onTimeout()
+        } catch (e: Exception) {
+            // If any error occurs, just go to login
+            onTimeout()
+        }
     }
 
     Box(
@@ -82,3 +120,4 @@ fun SplashScreenPreview() {
         SplashScreen(onTimeout = {})
     }
 }
+

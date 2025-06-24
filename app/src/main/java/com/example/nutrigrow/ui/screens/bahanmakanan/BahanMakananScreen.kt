@@ -1,14 +1,22 @@
 package com.example.nutrigrow.ui.screens.bahanmakanan
 
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items // Correct import for LazyColumn items
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.nutrigrow.models.BahanMakanan
 import com.example.nutrigrow.ui.screens.bahanmakanan.BahanMakananUiState
@@ -51,35 +59,92 @@ fun BahanMakananScreen(
     uiState: BahanMakananUiState,
     onRefreshClicked: () -> Unit
 ) {
+    var searchText by remember { mutableStateOf("") }
+    
     Column(
-        modifier = modifier
-            .fillMaxSize()
-            .padding(16.dp),
-        horizontalAlignment = Alignment.CenterHorizontally
+        modifier = modifier.fillMaxWidth()
     ) {
-        Button(
-            onClick = onRefreshClicked,
-            enabled = !uiState.isLoading // Use the isLoading property from uiState
-        ) {
-            Text("Muat Bahan Makanan")
-        }
-
+        // Search Ingredients Section
+        Text(
+            text = "Search Ingredients",
+            style = MaterialTheme.typography.titleMedium,
+            fontWeight = FontWeight.Medium,
+            modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
+        )
+        
+        // Search Bar
+        OutlinedTextField(
+            value = searchText,
+            onValueChange = { searchText = it },
+            placeholder = { Text("Turmeric", color = Color.Gray) },
+            trailingIcon = {
+                Icon(
+                    imageVector = Icons.Default.Search,
+                    contentDescription = "Search",
+                    tint = Color.Gray
+                )
+            },
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp),
+            shape = RoundedCornerShape(12.dp),
+            colors = OutlinedTextFieldDefaults.colors(
+                focusedBorderColor = Color.Gray,
+                unfocusedBorderColor = Color.LightGray
+            )
+        )
+        
         Spacer(modifier = Modifier.height(16.dp))
-
+        
         // Handle the UI based on the single uiState object
         if (uiState.isLoading) {
-            CircularProgressIndicator()
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(120.dp),
+                contentAlignment = Alignment.Center
+            ) {
+                CircularProgressIndicator()
+            }
         } else if (uiState.errorMessage != null) {
-            // New: We can now display errors received from the ViewModel
-            Text("Error: ${uiState.errorMessage}")
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(120.dp),
+                contentAlignment = Alignment.Center
+            ) {
+                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                    Text("Error: ${uiState.errorMessage}")
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Button(onClick = onRefreshClicked) {
+                        Text("Retry")
+                    }
+                }
+            }
         } else if (uiState.bahanMakananList.isEmpty()) {
-            Text("Belum ada data bahan makanan.")
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(120.dp),
+                contentAlignment = Alignment.Center
+            ) {
+                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                    Text("Belum ada data bahan makanan.")
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Button(onClick = onRefreshClicked) {
+                        Text("Muat Bahan Makanan")
+                    }
+                }
+            }
         } else {
-            LazyColumn(
-                verticalArrangement = Arrangement.spacedBy(8.dp) // A cleaner way to add space
+            // Ingredients Carousel
+            LazyRow(
+                horizontalArrangement = Arrangement.spacedBy(12.dp),
+                contentPadding = PaddingValues(horizontal = 16.dp),
+                modifier = Modifier.fillMaxWidth()
             ) {
                 items(uiState.bahanMakananList) { bahan ->
-                    BahanMakananCard(bahan = bahan)
+                    BahanMakananCarouselCard(bahan = bahan)
                 }
             }
         }
@@ -87,23 +152,51 @@ fun BahanMakananScreen(
 }
 
 @Composable
-fun BahanMakananCard(bahan: BahanMakanan) {
+fun BahanMakananCarouselCard(bahan: BahanMakanan) {
     Card(
-        modifier = Modifier.fillMaxWidth(),
-        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+        modifier = Modifier
+            .width(80.dp)
+            .height(100.dp),
+        shape = RoundedCornerShape(12.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = Color.White
+        ),
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
     ) {
-        Column(modifier = Modifier.padding(16.dp)) {
-            Text(
-                text = bahan.nama,
-                style = MaterialTheme.typography.titleMedium
-            )
-            Spacer(modifier = Modifier.height(4.dp))
-            bahan.deskripsi?.let { // Good practice to handle nullable descriptions
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(8.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
+        ) {
+            // Placeholder for ingredient icon/image
+            Box(
+                modifier = Modifier
+                    .size(40.dp)
+                    .clip(RoundedCornerShape(8.dp))
+                    .padding(4.dp),
+                contentAlignment = Alignment.Center
+            ) {
+                // You can replace this with actual ingredient images
                 Text(
-                    text = it,
-                    style = MaterialTheme.typography.bodyMedium
+                    text = bahan.nama.take(2).uppercase(),
+                    style = MaterialTheme.typography.bodySmall,
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.primary
                 )
             }
+            
+            Spacer(modifier = Modifier.height(4.dp))
+            
+            Text(
+                text = bahan.nama,
+                style = MaterialTheme.typography.bodySmall,
+                fontSize = 10.sp,
+                textAlign = TextAlign.Center,
+                maxLines = 2,
+                modifier = Modifier.fillMaxWidth()
+            )
         }
     }
 }
@@ -114,8 +207,11 @@ fun BahanMakananCard(bahan: BahanMakanan) {
 @Composable
 fun BahanMakananScreenPreview() {
     val sampleList = listOf(
-        BahanMakanan(id = "1", nama = "Bayam", deskripsi = "Sayuran hijau kaya zat besi."),
-        BahanMakanan(id = "2", nama = "Telur", deskripsi = "Sumber protein hewani yang baik.")
+        BahanMakanan(id = "1", nama = "Ginger", deskripsi = "Sayuran hijau kaya zat besi."),
+        BahanMakanan(id = "2", nama = "Carrot", deskripsi = "Sumber protein hewani yang baik."),
+        BahanMakanan(id = "3", nama = "Celery", deskripsi = "Sayuran segar."),
+        BahanMakanan(id = "4", nama = "Onion", deskripsi = "Bumbu dapur."),
+        BahanMakanan(id = "5", nama = "Nutmeg", deskripsi = "Rempah-rempah.")
     )
     BahanMakananScreen(
         uiState = BahanMakananUiState(bahanMakananList = sampleList),
@@ -140,3 +236,4 @@ fun BahanMakananScreenErrorPreview() {
         onRefreshClicked = {}
     )
 }
+
