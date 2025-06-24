@@ -17,10 +17,7 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.nutrigrow.ui.theme.NutriGrowTheme
 import com.example.nutrigrow.ui.theme.PrimaryPink
-import com.example.nutrigrow.ui.theme.SplashBackground
-import com.example.nutrigrow.ui.theme.SplashText
 
 @Composable
 fun LoginRoute(
@@ -42,6 +39,7 @@ fun LoginRoute(
     // Handle successful login navigation. This remains unchanged.
     LaunchedEffect(uiState.loginResponse) {
         uiState.loginResponse?.let { loginData ->
+            // FIX: Access accessToken from the loginData object
             loginData.accessToken?.let { token ->
                 authViewModel.saveTokenAfterLogin(token)
                 onLoginSuccess()
@@ -87,7 +85,7 @@ fun LoginScreen(
         ) {
             Text(
                 text = "Welcome Back!",
-                fontSize = 28.sp,
+                fontSize = 24.sp,
                 fontWeight = FontWeight.Bold,
                 color = SplashText
             )
@@ -97,7 +95,7 @@ fun LoginScreen(
                 fontSize = 16.sp,
                 color = SplashText.copy(alpha = 0.8f)
             )
-            Spacer(modifier = Modifier.height(48.dp))
+            Spacer(modifier = Modifier.height(32.dp))
 
             OutlinedTextField(
                 value = email,
@@ -158,10 +156,7 @@ fun LoginScreen(
                 enabled = !uiState.isLoading
             ) {
                 if (uiState.isLoading) {
-                    CircularProgressIndicator(
-                        modifier = Modifier.size(24.dp),
-                        color = Color.White
-                    )
+                    CircularProgressIndicator(color = Color.White)
                 } else {
                     Text(text = "Login", color = Color.White, fontSize = 16.sp)
                 }

@@ -23,8 +23,3 @@ val SplashBackground = Color(0xFFFDF7F2)
 val SplashPinkLight = Color(0xFFFCE9E8)
 val SplashPinkDark = Color(0xFFF9E0DE)
 val SplashText = Color(0xFF442C2E)
-
-val ScreenBackground = Color(0xFFFCF5F3)
-val ButtonPink = Color(0xFFF7D4D5)
-val TextDark = Color(0xFF3A3A3A)
-val FabPink = Color(0xFFF3B7B8)
