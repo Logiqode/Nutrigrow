@@ -13,9 +13,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import compose.icons.FontAwesomeIcons
-import compose.icons.fontawesomeicons.Solid
-import compose.icons.fontawesomeicons.solid.ArrowLeft
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
@@ -52,7 +49,7 @@ fun AddChildScreen(
                 title = { Text("Add New Child") },
                 navigationIcon = {
                     IconButton(onClick = onBackClick) {
-                        Icon(FontAwesomeIcons.Solid.ArrowLeft, contentDescription = "Back")
+                        Icon(Icons.Default.ArrowBack, contentDescription = "Back")
                     }
                 }
             )
@@ -148,6 +145,7 @@ fun AddChildScreen(
                             ExposedDropdownMenuDefaults.TrailingIcon(expanded = isGenderDropdownExpanded)
                         },
                         modifier = Modifier
+                            .menuAnchor()
                             .fillMaxWidth(),
                         shape = RoundedCornerShape(12.dp),
                         colors = OutlinedTextFieldDefaults.colors(

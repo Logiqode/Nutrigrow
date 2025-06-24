@@ -15,7 +15,8 @@ data class UserUiState(
     val user: UserResponse? = null,
     val isLoading: Boolean = false,
     val errorMessage: String? = null,
-    val isUpdateSuccess: Boolean = false
+    val isUpdateSuccess: Boolean = false,
+    val shouldLogout: Boolean = false // Added to trigger logout on auth errors
 )
 
 class UserViewModel(
@@ -46,7 +47,18 @@ class UserViewModel(
                         _uiState.update { it.copy(isLoading = false, errorMessage = "User data is empty") }
                     }
                 } else {
-                    _uiState.update { it.copy(isLoading = false, errorMessage = "Failed to load profile") }
+                    // Check if it's an authentication error (401 Unauthorized)
+                    if (response.code() == 401) {
+                        _uiState.update { 
+                            it.copy(
+                                isLoading = false, 
+                                errorMessage = "Session expired. Please login again.",
+                                shouldLogout = true
+                            ) 
+                        }
+                    } else {
+                        _uiState.update { it.copy(isLoading = false, errorMessage = "Failed to load profile") }
+                    }
                 }
             } catch (e: Exception) {
                 _uiState.update { it.copy(isLoading = false, errorMessage = e.message ?: "Unknown error occurred") }
@@ -73,7 +85,18 @@ class UserViewModel(
                         }
                     }
                 } else {
-                    _uiState.update { it.copy(isLoading = false, errorMessage = "Failed to update profile") }
+                    // Check for authentication errors
+                    if (response.code() == 401) {
+                        _uiState.update { 
+                            it.copy(
+                                isLoading = false, 
+                                errorMessage = "Session expired. Please login again.",
+                                shouldLogout = true
+                            ) 
+                        }
+                    } else {
+                        _uiState.update { it.copy(isLoading = false, errorMessage = "Failed to update profile") }
+                    }
                 }
             } catch (e: Exception) {
                 _uiState.update { it.copy(isLoading = false, errorMessage = e.message ?: "Unknown error") }
@@ -106,8 +129,19 @@ class UserViewModel(
                 if (response.isSuccessful) {
                     _uiState.update { it.copy(isLoading = false, isUpdateSuccess = true) }
                 } else {
-                    // You could parse the server's error message here for more detail
-                    _uiState.update { it.copy(isLoading = false, errorMessage = "Failed to change password") }
+                    // Check for authentication errors
+                    if (response.code() == 401) {
+                        _uiState.update { 
+                            it.copy(
+                                isLoading = false, 
+                                errorMessage = "Session expired. Please login again.",
+                                shouldLogout = true
+                            ) 
+                        }
+                    } else {
+                        // You could parse the server's error message here for more detail
+                        _uiState.update { it.copy(isLoading = false, errorMessage = "Failed to change password") }
+                    }
                 }
             } catch (e: Exception) {
                 _uiState.update { it.copy(isLoading = false, errorMessage = e.message ?: "Unknown error") }
@@ -121,5 +155,9 @@ class UserViewModel(
 
     fun clearError() {
         _uiState.update { it.copy(errorMessage = null) }
+    }
+
+    fun clearLogoutFlag() {
+        _uiState.update { it.copy(shouldLogout = false) }
     }
 }

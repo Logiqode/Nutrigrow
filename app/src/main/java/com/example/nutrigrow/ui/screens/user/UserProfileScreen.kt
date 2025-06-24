@@ -40,6 +40,14 @@ fun UserProfileRoute(
     }
     val uiState by viewModel.uiState.collectAsState()
 
+    // Handle automatic logout when authentication fails
+    LaunchedEffect(uiState.shouldLogout) {
+        if (uiState.shouldLogout) {
+            viewModel.clearLogoutFlag()
+            onLogout()
+        }
+    }
+
     UserProfileScreen(
         uiState = uiState,
         onProfileClick = { onNavigate(Screen.ProfileView.route) },

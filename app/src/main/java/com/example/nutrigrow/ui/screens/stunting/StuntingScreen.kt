@@ -113,6 +113,7 @@ fun StuntingScreen(
                             ExposedDropdownMenuDefaults.TrailingIcon(expanded = isGenderDropdownExpanded)
                         },
                         modifier = Modifier
+                            .menuAnchor()
                             .fillMaxWidth(),
                         shape = RoundedCornerShape(12.dp),
                         colors = OutlinedTextFieldDefaults.colors(

@@ -22,9 +22,6 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.nutrigrow.di.ViewModelFactory
 import com.example.nutrigrow.models.Child
-import compose.icons.FontAwesomeIcons
-import compose.icons.fontawesomeicons.Solid
-import compose.icons.fontawesomeicons.solid.ArrowLeft
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.util.*
@@ -111,7 +108,7 @@ fun CalendarNotesScreen(
                 title = { Text("Calendar Notes") },
                 navigationIcon = {
                     IconButton(onClick = onBackClick) {
-                        Icon(FontAwesomeIcons.Solid.ArrowLeft, contentDescription = "Back")
+                        Icon(Icons.Default.ArrowBack, contentDescription = "Back")
                     }
                 }
             )

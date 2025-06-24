@@ -121,7 +121,7 @@ fun TrackingScreen(
                     trailingIcon = {
                         ExposedDropdownMenuDefaults.TrailingIcon(expanded = isYearDropdownExpanded)
                     },
-                    modifier = Modifier,
+                    modifier = Modifier.menuAnchor(),
                     shape = RoundedCornerShape(12.dp),
                     colors = OutlinedTextFieldDefaults.colors(
                         focusedBorderColor = Color(0xFFE91E63),
@@ -158,7 +158,7 @@ fun TrackingScreen(
                     trailingIcon = {
                         ExposedDropdownMenuDefaults.TrailingIcon(expanded = isMonthDropdownExpanded)
                     },
-                    modifier = Modifier,
+                    modifier = Modifier.menuAnchor(),
                     shape = RoundedCornerShape(12.dp),
                     colors = OutlinedTextFieldDefaults.colors(
                         focusedBorderColor = Color(0xFFE91E63),

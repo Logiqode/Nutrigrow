@@ -46,6 +46,8 @@ fun SplashScreen(
                 if (sessionValid) {
                     // Session is still valid, update last login time and go to main
                     sessionManager.updateLastLoginTime()
+                    // Set the token in RetrofitClient for API calls
+                    com.example.nutrigrow.api.RetrofitClient.setAuthToken(authToken)
                     onAutoLogin()
                     return@LaunchedEffect
                 }
@@ -56,6 +58,8 @@ fun SplashScreen(
             if (rememberMeToken != null) {
                 // Remember me token is valid, restore session and go to main
                 sessionManager.saveAuthToken(rememberMeToken, true)
+                // Set the token in RetrofitClient for API calls
+                com.example.nutrigrow.api.RetrofitClient.setAuthToken(rememberMeToken)
                 onAutoLogin()
                 return@LaunchedEffect
             }
