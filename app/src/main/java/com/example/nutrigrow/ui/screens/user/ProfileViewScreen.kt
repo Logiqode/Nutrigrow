@@ -2,36 +2,25 @@ package com.example.nutrigrow.ui.screens.user
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.automirrored.filled.ArrowForward
-import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.*
-import com.example.nutrigrow.models.UserResponse
-import com.example.nutrigrow.ui.theme.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.input.PasswordVisualTransformation
-import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import coil.compose.rememberAsyncImagePainter
-import androidx.lifecycle.viewmodel.compose.viewModel
-import com.example.nutrigrow.di.ViewModelFactory
-import androidx.compose.ui.platform.LocalContext
+import com.example.nutrigrow.ui.theme.*
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -41,6 +30,19 @@ fun ProfileViewRoute(
     onNavigateToEdit: () -> Unit,
 ) {
     val uiState by viewModel.uiState.collectAsState()
+
+    // Load user profile when the screen is first composed
+    LaunchedEffect(Unit) {
+        viewModel.loadUserProfile()
+    }
+
+    // Handle automatic logout when authentication fails
+    LaunchedEffect(uiState.shouldLogout) {
+        if (uiState.shouldLogout) {
+            viewModel.clearLogoutFlag()
+            onBackClick() // Navigate back instead of logout here since we're in a nested screen
+        }
+    }
 
     ProfileViewScreen(
         uiState = uiState,
@@ -56,8 +58,6 @@ fun ProfileViewScreen(
     onBackClick: () -> Unit,
     onEditClick: () -> Unit
 ) {
-    val user = uiState.user ?: return
-
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -87,6 +87,63 @@ fun ProfileViewScreen(
 
         Spacer(modifier = Modifier.height(32.dp))
 
+        // Content based on state
+        when {
+            uiState.isLoading -> {
+                Box(
+                    modifier = Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    CircularProgressIndicator()
+                }
+            }
+
+            uiState.errorMessage != null -> {
+                Box(
+                    modifier = Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Column(
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        Text(
+                            text = uiState.errorMessage,
+                            color = Color.Red,
+                            textAlign = TextAlign.Center
+                        )
+                        Spacer(modifier = Modifier.height(16.dp))
+                        Button(onClick = onBackClick) {
+                            Text("Go Back")
+                        }
+                    }
+                }
+            }
+
+            uiState.user != null -> {
+                ProfileContent(
+                    user = uiState.user,
+                    onEditClick = onEditClick
+                )
+            }
+
+            else -> {
+                Box(
+                    modifier = Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text("No user data available")
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun ProfileContent(
+    user: com.example.nutrigrow.models.UserResponse,
+    onEditClick: () -> Unit
+) {
+    Column {
         // Profile picture
         Box(
             modifier = Modifier.fillMaxWidth(),
@@ -95,6 +152,7 @@ fun ProfileViewScreen(
             Image(
                 painter = rememberAsyncImagePainter(
                     model = user.imageUrl?.ifEmpty { "https://via.placeholder.com/120" }
+                        ?: "https://via.placeholder.com/120"
                 ),
                 contentDescription = "Profile Picture",
                 modifier = Modifier
@@ -114,7 +172,7 @@ fun ProfileViewScreen(
         )
 
         OutlinedTextField(
-            value = user.name ?: "",
+            value = user.name ?: "No name",
             onValueChange = { },
             enabled = false,
             modifier = Modifier.fillMaxWidth(),
@@ -134,7 +192,7 @@ fun ProfileViewScreen(
         )
 
         OutlinedTextField(
-            value = user.email ?: "",
+            value = user.email ?: "No email",
             onValueChange = { },
             enabled = false,
             modifier = Modifier.fillMaxWidth(),

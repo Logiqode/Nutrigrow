@@ -24,7 +24,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.rememberAsyncImagePainter
 import com.example.nutrigrow.di.ViewModelFactory
-import com.example.nutrigrow.navigation.Screen
 import androidx.compose.runtime.getValue
 
 @Composable
@@ -50,8 +49,8 @@ fun UserProfileRoute(
 
     UserProfileScreen(
         uiState = uiState,
-        onProfileClick = { onNavigate(Screen.ProfileView.route) },
-        onChangePasswordClick = { onNavigate(Screen.ChangePassword.route) },
+        onProfileClick = { onNavigate("profile_view") }, // Fixed: Use string routes instead of Screen constants
+        onChangePasswordClick = { onNavigate("change_password") }, // Fixed: Use string routes instead of Screen constants
         onFAQClick = { /* TODO */ },
         onAboutUsClick = { /* TODO */ },
         onTermsClick = { /* TODO */ },
@@ -160,5 +159,3 @@ fun MenuItemRow(title: String, onClick: () -> Unit) {
         )
     }
 }
-
-

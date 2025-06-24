@@ -93,50 +93,35 @@ fun AppNavHost() {
             )
         }
 
-        // --- NESTED NAVIGATION GRAPH FOR THE PROFILE FEATURE ---
-        navigation(
-            route = "profile_flow",
-            startDestination = Screen.ProfileView.route
-        ) {
-            composable(Screen.ProfileView.route) { backStackEntry ->
-                val parentEntry = remember(backStackEntry) {
-                    navController.getBackStackEntry("profile_flow")
-                }
-                val userViewModel: UserViewModel = viewModel(parentEntry, factory = viewModelFactory)
+        // FIXED: Move profile screens to the main navigation graph
+        // Profile View Screen
+        composable(Screen.ProfileView.route) {
+            val userViewModel: UserViewModel = viewModel(factory = viewModelFactory)
+            ProfileViewRoute(
+                viewModel = userViewModel,
+                onBackClick = { navController.popBackStack() },
+                onNavigateToEdit = { navController.navigate(Screen.EditProfile.route) }
+            )
+        }
 
-                ProfileViewRoute(
-                    viewModel = userViewModel,
-                    onBackClick = { navController.popBackStack() },
-                    onNavigateToEdit = { navController.navigate(Screen.EditProfile.route) }
-                )
-            }
+        // Edit Profile Screen
+        composable(Screen.EditProfile.route) {
+            val userViewModel: UserViewModel = viewModel(factory = viewModelFactory)
+            EditProfileRoute(
+                viewModel = userViewModel,
+                onBackClick = { navController.popBackStack() },
+                onSaveSuccess = { navController.popBackStack() }
+            )
+        }
 
-            composable(Screen.EditProfile.route) { backStackEntry ->
-                val parentEntry = remember(backStackEntry) {
-                    navController.getBackStackEntry("profile_flow")
-                }
-                val userViewModel: UserViewModel = viewModel(parentEntry, factory = viewModelFactory)
-
-                EditProfileRoute(
-                    viewModel = userViewModel,
-                    onBackClick = { navController.popBackStack() },
-                    onSaveSuccess = { navController.popBackStack() }
-                )
-            }
-
-            composable(Screen.ChangePassword.route) { backStackEntry ->
-                val parentEntry = remember(backStackEntry) {
-                    navController.getBackStackEntry("profile_flow")
-                }
-                val userViewModel: UserViewModel = viewModel(parentEntry, factory = viewModelFactory)
-
-                ChangePasswordRoute(
-                    viewModel = userViewModel,
-                    onBackClick = { navController.popBackStack() },
-                    onChangeSuccess = { navController.popBackStack() }
-                )
-            }
+        // Change Password Screen
+        composable(Screen.ChangePassword.route) {
+            val userViewModel: UserViewModel = viewModel(factory = viewModelFactory)
+            ChangePasswordRoute(
+                viewModel = userViewModel,
+                onBackClick = { navController.popBackStack() },
+                onChangeSuccess = { navController.popBackStack() }
+            )
         }
     }
 }
-

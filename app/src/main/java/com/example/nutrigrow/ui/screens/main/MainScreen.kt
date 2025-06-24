@@ -21,6 +21,9 @@ import com.example.nutrigrow.ui.screens.tracking.TrackingScreen
 import com.example.nutrigrow.ui.screens.calendar.CalendarNotesScreen
 import com.example.nutrigrow.ui.screens.child.AddChildScreen
 import com.example.nutrigrow.ui.screens.user.UserProfileRoute
+import com.example.nutrigrow.ui.screens.user.ProfileViewRoute
+import com.example.nutrigrow.ui.screens.user.EditProfileRoute
+import com.example.nutrigrow.ui.screens.user.ChangePasswordRoute
 import com.example.nutrigrow.ui.screens.user.UserViewModel
 import java.time.LocalDate
 
@@ -70,7 +73,7 @@ fun MainNavHost(
 ) {
     val context = LocalContext.current
     val viewModelFactory = ViewModelFactory.getInstance(context)
-    
+
     NavHost(
         navController = navController,
         startDestination = "home",
@@ -86,15 +89,15 @@ fun MainNavHost(
                 }
             )
         }
-        
+
         composable("feed") {
             FoodRoute()
         }
-        
+
         composable("scan") {
             StuntingRoute()
         }
-        
+
         composable("track") {
             TrackingScreen(
                 onNavigateToStunting = {
@@ -109,7 +112,7 @@ fun MainNavHost(
                 viewModelFactory = viewModelFactory
             )
         }
-        
+
         composable("account") {
             val userViewModel: UserViewModel = viewModel(factory = viewModelFactory)
             UserProfileRoute(
@@ -119,15 +122,15 @@ fun MainNavHost(
                 onLogout = onLogout
             )
         }
-        
+
         composable("stunting") {
             StuntingRoute()
         }
-        
+
         composable("calendar_notes/{selectedDate}") { backStackEntry ->
             val selectedDateString = backStackEntry.arguments?.getString("selectedDate")
             val selectedDate = selectedDateString?.let { LocalDate.parse(it) } ?: LocalDate.now()
-            
+
             CalendarNotesScreen(
                 selectedDate = selectedDate,
                 onBackClick = {
@@ -139,7 +142,7 @@ fun MainNavHost(
                 viewModelFactory = viewModelFactory
             )
         }
-        
+
         composable("add_child") {
             AddChildScreen(
                 onBackClick = {
@@ -148,6 +151,34 @@ fun MainNavHost(
                 onSaveChild = { childData ->
                     navController.popBackStack()
                 }
+            )
+        }
+
+        // Add the missing profile screens to the MainNavHost
+        composable("profile_view") {
+            val userViewModel: UserViewModel = viewModel(factory = viewModelFactory)
+            ProfileViewRoute(
+                viewModel = userViewModel,
+                onBackClick = { navController.popBackStack() },
+                onNavigateToEdit = { navController.navigate("edit_profile") }
+            )
+        }
+
+        composable("edit_profile") {
+            val userViewModel: UserViewModel = viewModel(factory = viewModelFactory)
+            EditProfileRoute(
+                viewModel = userViewModel,
+                onBackClick = { navController.popBackStack() },
+                onSaveSuccess = { navController.popBackStack() }
+            )
+        }
+
+        composable("change_password") {
+            val userViewModel: UserViewModel = viewModel(factory = viewModelFactory)
+            ChangePasswordRoute(
+                viewModel = userViewModel,
+                onBackClick = { navController.popBackStack() },
+                onChangeSuccess = { navController.popBackStack() }
             )
         }
     }
@@ -159,4 +190,3 @@ private fun shouldShowBottomNav(currentRoute: String?): Boolean {
         else -> false
     }
 }
-
