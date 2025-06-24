@@ -12,6 +12,7 @@ import androidx.navigation.compose.rememberNavController
 import com.example.nutrigrow.di.ViewModelFactory
 import com.example.nutrigrow.ui.screens.auth.AuthViewModel
 import com.example.nutrigrow.ui.screens.auth.LoginRoute
+import com.example.nutrigrow.ui.screens.auth.RegisterRoute
 import com.example.nutrigrow.ui.screens.main.MainScreen
 import com.example.nutrigrow.ui.screens.splash.SplashScreen
 import com.example.nutrigrow.ui.screens.user.ChangePasswordRoute
@@ -24,6 +25,7 @@ import com.example.nutrigrow.ui.screens.user.UserViewModel
 sealed class Screen(val route: String) {
     object Splash : Screen("splash")
     object Login : Screen("login")
+    object Register : Screen("register")
     object Main : Screen("main")
     object ProfileView : Screen("profile_view")
     object EditProfile : Screen("edit_profile")
@@ -74,6 +76,27 @@ fun AppNavHost() {
                             inclusive = true
                         }
                     }
+                },
+                onNavigateToRegister = {
+                    navController.navigate(Screen.Register.route)
+                }
+            )
+        }
+
+        // Register Screen
+        composable(Screen.Register.route) {
+            val authViewModel: AuthViewModel = viewModel(factory = viewModelFactory)
+            RegisterRoute(
+                authViewModel = authViewModel,
+                onRegisterSuccess = {
+                    navController.navigate(Screen.Login.route) {
+                        popUpTo(Screen.Register.route) {
+                            inclusive = true
+                        }
+                    }
+                },
+                onNavigateToLogin = {
+                    navController.popBackStack()
                 }
             )
         }

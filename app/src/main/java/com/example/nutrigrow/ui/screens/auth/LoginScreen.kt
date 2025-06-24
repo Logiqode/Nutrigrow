@@ -21,7 +21,8 @@ import com.example.nutrigrow.ui.theme.SplashText
 @Composable
 fun LoginRoute(
     authViewModel: AuthViewModel,
-    onLoginSuccess: () -> Unit
+    onLoginSuccess: () -> Unit,
+    onNavigateToRegister: () -> Unit
 ) {
     val uiState by authViewModel.uiState.collectAsState()
     val snackbarHostState = remember { SnackbarHostState() }
@@ -33,7 +34,8 @@ fun LoginRoute(
         LoginScreen(
             modifier = Modifier.padding(paddingValues), // Apply padding
             uiState = uiState,
-            onLoginClicked = authViewModel::login
+            onLoginClicked = authViewModel::login,
+            onNavigateToRegister = onNavigateToRegister
         )
     }
 
@@ -67,6 +69,7 @@ fun LoginScreen(
     modifier: Modifier = Modifier,
     uiState: LoginUiState,
     onLoginClicked: (String, String) -> Unit,
+    onNavigateToRegister: () -> Unit
 ) {
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
@@ -150,6 +153,18 @@ fun LoginScreen(
                     Text(text = "Login", color = Color.White, fontSize = 16.sp)
                 }
             }
+
+            Spacer(modifier = Modifier.height(24.dp))
+
+            TextButton(
+                onClick = onNavigateToRegister
+            ) {
+                Text(
+                    text = "Don't have an account? Register",
+                    color = PrimaryPink,
+                    fontSize = 14.sp
+                )
+            }
         }
     }
 }
@@ -162,6 +177,7 @@ fun LoginScreenThemedPreview() {
         LoginScreen(
             uiState = LoginUiState(isLoading = false, errorMessage = null),
             onLoginClicked = { _, _ -> },
+            onNavigateToRegister = {}
         )
     }
 }

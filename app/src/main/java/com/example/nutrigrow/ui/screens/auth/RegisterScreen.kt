@@ -3,12 +3,14 @@ package com.example.nutrigrow.ui.screens.auth
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -34,7 +36,9 @@ fun RegisterRoute(
         RegisterScreen(
             modifier = Modifier.padding(paddingValues), // Apply padding
             uiState = uiState,
-            onRegisterClicked = authViewModel::register,
+            onRegisterClicked = { name, email, password, telpNumber ->
+                authViewModel.register(name, email, password, telpNumber)
+            },
             onNavigateToLogin = onNavigateToLogin
         )
     }
@@ -64,11 +68,12 @@ fun RegisterRoute(
 fun RegisterScreen(
     modifier: Modifier = Modifier,
     uiState: LoginUiState,
-    onRegisterClicked: (String, String, String) -> Unit,
+    onRegisterClicked: (String, String, String, String) -> Unit,
     onNavigateToLogin: () -> Unit
 ) {
     var name by remember { mutableStateOf("") }
     var email by remember { mutableStateOf("") }
+    var telpNumber by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var confirmPassword by remember { mutableStateOf("") }
 
@@ -109,7 +114,8 @@ fun RegisterScreen(
                     cursorColor = PrimaryPink,
                     focusedTextColor = SplashText,
                     unfocusedTextColor = SplashText,
-                )
+                ),
+                singleLine = true
             )
 
             Spacer(modifier = Modifier.height(16.dp))
@@ -125,7 +131,27 @@ fun RegisterScreen(
                     cursorColor = PrimaryPink,
                     focusedTextColor = SplashText,
                     unfocusedTextColor = SplashText,
-                )
+                ),
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
+                singleLine = true
+            )
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            OutlinedTextField(
+                value = telpNumber,
+                onValueChange = { telpNumber = it },
+                label = { Text("Phone Number") },
+                modifier = Modifier.fillMaxWidth(),
+                colors = OutlinedTextFieldDefaults.colors(
+                    focusedBorderColor = PrimaryPink,
+                    unfocusedBorderColor = Color.Gray.copy(alpha = 0.4f),
+                    cursorColor = PrimaryPink,
+                    focusedTextColor = SplashText,
+                    unfocusedTextColor = SplashText,
+                ),
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone),
+                singleLine = true
             )
 
             Spacer(modifier = Modifier.height(16.dp))
@@ -142,7 +168,9 @@ fun RegisterScreen(
                     cursorColor = PrimaryPink,
                     focusedTextColor = SplashText,
                     unfocusedTextColor = SplashText,
-                )
+                ),
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
+                singleLine = true
             )
 
             Spacer(modifier = Modifier.height(16.dp))
@@ -159,15 +187,17 @@ fun RegisterScreen(
                     cursorColor = PrimaryPink,
                     focusedTextColor = SplashText,
                     unfocusedTextColor = SplashText,
-                )
+                ),
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
+                singleLine = true
             )
 
             Spacer(modifier = Modifier.height(48.dp))
 
             Button(
-                onClick = { 
+                onClick = {
                     if (password == confirmPassword) {
-                        onRegisterClicked(name, email, password)
+                        onRegisterClicked(name, email, password, telpNumber)
                     }
                 },
                 modifier = Modifier
@@ -175,8 +205,8 @@ fun RegisterScreen(
                     .height(50.dp),
                 colors = ButtonDefaults.buttonColors(containerColor = PrimaryPink),
                 shape = RoundedCornerShape(12.dp),
-                enabled = !uiState.isLoading && name.isNotBlank() && email.isNotBlank() && 
-                         password.isNotBlank() && password == confirmPassword
+                enabled = !uiState.isLoading && name.isNotBlank() && email.isNotBlank() &&
+                        telpNumber.isNotBlank() && password.isNotBlank() && password == confirmPassword
             ) {
                 if (uiState.isLoading) {
                     CircularProgressIndicator(
@@ -209,9 +239,8 @@ fun RegisterScreenThemedPreview() {
     NutriGrowTheme {
         RegisterScreen(
             uiState = LoginUiState(isLoading = false, errorMessage = null),
-            onRegisterClicked = { _, _, _ -> },
+            onRegisterClicked = { _, _, _, _ -> },
             onNavigateToLogin = { }
         )
     }
 }
-

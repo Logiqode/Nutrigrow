@@ -62,12 +62,12 @@ class AuthViewModel(
         }
     }
 
-    fun register(name: String, email: String, password: String) {
+    fun register(name: String, email: String, password: String, telpNumber: String) {
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true, errorMessage = null) }
 
             try {
-                val request = RegisterRequest(email, password, name)
+                val request = RegisterRequest(email, password, name, telpNumber)
                 val response = apiService.register(request)
 
                 if (response.isSuccessful) {
