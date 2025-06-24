@@ -15,6 +15,7 @@ import androidx.navigation.compose.rememberNavController
 import com.example.nutrigrow.di.ViewModelFactory
 import com.example.nutrigrow.ui.components.BottomNavigationBar
 import com.example.nutrigrow.ui.screens.home.HomeScreenRoute
+import com.example.nutrigrow.ui.screens.food.FoodRoute
 import com.example.nutrigrow.ui.screens.stunting.StuntingRoute
 import com.example.nutrigrow.ui.screens.tracking.TrackingScreen
 import com.example.nutrigrow.ui.screens.calendar.CalendarNotesScreen
@@ -87,7 +88,7 @@ fun MainNavHost(
         }
         
         composable("feed") {
-            FeedScreen()
+            FoodRoute()
         }
         
         composable("scan") {
@@ -149,22 +150,6 @@ fun MainNavHost(
                 }
             )
         }
-    }
-}
-
-@Composable
-fun FeedScreen() {
-    // Placeholder for Feed screen as requested
-    androidx.compose.foundation.layout.Box(
-        modifier = Modifier.fillMaxSize(),
-        contentAlignment = androidx.compose.ui.Alignment.Center
-    ) {
-        androidx.compose.material3.Text(
-            text = "Feed Screen\n(Coming Soon)",
-            style = androidx.compose.material3.MaterialTheme.typography.headlineMedium,
-            textAlign = androidx.compose.ui.text.style.TextAlign.Center,
-            color = androidx.compose.ui.graphics.Color.Gray
-        )
     }
 }
 

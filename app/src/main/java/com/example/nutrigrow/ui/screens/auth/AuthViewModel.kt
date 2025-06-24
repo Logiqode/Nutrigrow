@@ -8,6 +8,8 @@ import com.example.nutrigrow.di.SessionManager
 import com.example.nutrigrow.models.LoginData
 import com.example.nutrigrow.models.LoginRequest
 import com.example.nutrigrow.models.LoginResponse
+import com.example.nutrigrow.models.RegisterRequest
+import com.example.nutrigrow.models.UserResponse
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -16,6 +18,7 @@ import kotlinx.coroutines.launch
 
 data class LoginUiState(
     val loginResponse: LoginData? = null,
+    val registerResponse: UserResponse? = null,
     val isLoading: Boolean = false,
     val errorMessage: String? = null
 )
@@ -52,6 +55,34 @@ class AuthViewModel(
                     }
                 } else {
                     _uiState.update { it.copy(isLoading = false, errorMessage = "Login failed: ${response.message()}") }
+                }
+            } catch (e: Exception) {
+                _uiState.update { it.copy(isLoading = false, errorMessage = e.message ?: "Unknown error occurred") }
+            }
+        }
+    }
+
+    fun register(name: String, email: String, password: String) {
+        viewModelScope.launch {
+            _uiState.update { it.copy(isLoading = true, errorMessage = null) }
+
+            try {
+                val request = RegisterRequest(email, password, name)
+                val response = apiService.register(request)
+
+                if (response.isSuccessful) {
+                    response.body()?.data?.let { userData ->
+                        _uiState.update {
+                            it.copy(
+                                registerResponse = userData,
+                                isLoading = false
+                            )
+                        }
+                    } ?: run {
+                        _uiState.update { it.copy(isLoading = false, errorMessage = "Empty response data") }
+                    }
+                } else {
+                    _uiState.update { it.copy(isLoading = false, errorMessage = "Registration failed: ${response.message()}") }
                 }
             } catch (e: Exception) {
                 _uiState.update { it.copy(isLoading = false, errorMessage = e.message ?: "Unknown error occurred") }

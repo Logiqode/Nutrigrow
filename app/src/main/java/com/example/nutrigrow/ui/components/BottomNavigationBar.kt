@@ -29,7 +29,7 @@ fun BottomNavigationBar(
 ) {
     val items = listOf(
         BottomNavItem("home", Icons.Default.Home, "Home"),
-        BottomNavItem("feed", FontAwesomeIcons.Solid.BookOpen, "Feed"),
+        BottomNavItem("feed", FontAwesomeIcons.Solid.BookOpen, "Food"),
         BottomNavItem("scan", FontAwesomeIcons.Solid.Qrcode, "Scan"),
         BottomNavItem("track", FontAwesomeIcons.Solid.CalendarDay, "Track"),
         BottomNavItem("account", Icons.Default.AccountCircle, "Account")

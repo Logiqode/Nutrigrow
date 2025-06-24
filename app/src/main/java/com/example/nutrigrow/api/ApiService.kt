@@ -45,4 +45,8 @@ interface ApiService {
     @DELETE("api/stunting/{id}")
     suspend fun deleteStuntingRecord(@Path("id") id: String): Response<ApiResponse<Unit>>
 
+    @GET("api/makanan")
+    suspend fun getMakanan(): Response<ApiResponse<List<Makanan>>>
+
+
 }

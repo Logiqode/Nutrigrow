@@ -9,6 +9,7 @@ import com.example.nutrigrow.di.SessionManager
 import com.example.nutrigrow.ui.screens.auth.AuthViewModel
 import com.example.nutrigrow.ui.screens.bahanmakanan.BahanMakananViewModel
 import com.example.nutrigrow.ui.screens.calendar.CalendarViewModel
+import com.example.nutrigrow.ui.screens.food.FoodViewModel
 import com.example.nutrigrow.ui.screens.stunting.StuntingViewModel
 import com.example.nutrigrow.ui.screens.user.UserViewModel
 
@@ -27,6 +28,9 @@ class ViewModelFactory(
             }
             modelClass.isAssignableFrom(BahanMakananViewModel::class.java) -> {
                 BahanMakananViewModel(apiService) as T
+            }
+            modelClass.isAssignableFrom(FoodViewModel::class.java) -> {
+                FoodViewModel(apiService) as T
             }
             modelClass.isAssignableFrom(UserViewModel::class.java) -> {
                 UserViewModel(apiService) as T
